@@ -3,7 +3,9 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-STATIC_DIR = Path(__file__).resolve().parent / ""
+PROJECT_DIR = Path(__file__).resolve().parent
+NESTED_STATIC_DIR = PROJECT_DIR / "my_site_copy" / "my.funpapers.net"
+STATIC_DIR = PROJECT_DIR if (PROJECT_DIR / "index.html").exists() else NESTED_STATIC_DIR
 
 
 class SpaStaticHandler(SimpleHTTPRequestHandler):
