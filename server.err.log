@@ -1,0 +1,15 @@
+127.0.0.1 - - [09/May/2026 13:20:39] "GET /css/app.1f25d1c9.css HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:20:39] "GET /js/app.68848094.js HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:20:39] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:20:39] "GET /js/chunk-vendors.5ff6834c.js HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:20:54] "GET /manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /js/chunk-vendors.5ff6834c.js HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /js/app.68848094.js HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /css/app.1f25d1c9.css HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] code 404, message File not found
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /fonts/e-Ukraine-Regular.c6e80091.otf HTTP/1.1" 404 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /img/icons/apple-touch-icon-180x180.png HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /img/icons/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 13:21:14] code 404, message File not found
+127.0.0.1 - - [09/May/2026 13:21:14] "GET /service-worker.js HTTP/1.1" 404 -
