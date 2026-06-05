@@ -1,36 +1,14 @@
 import os
-import json
-import time
+import base64
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
-
+import storage
 
 PROJECT_DIR = Path(__file__).resolve().parent
 NESTED_STATIC_DIR = PROJECT_DIR / "my_site_copy" / "my.funpapers.net"
 STATIC_DIR = PROJECT_DIR if (PROJECT_DIR / "index.html").exists() else NESTED_STATIC_DIR
 LOCAL_ASSET_DIR = PROJECT_DIR / "project-main"
-TOKENS_FILE = PROJECT_DIR / "tokens.json"
-
-
-def load_tokens():
-    if not TOKENS_FILE.exists():
-        return {}
-    with open(TOKENS_FILE, "r") as f:
-        return json.load(f)
-
-
-def get_token_data(raw_token):
-    if not raw_token:
-        return None
-    tokens = load_tokens()
-    key = "full:" + raw_token
-    data = tokens.get(key)
-    if not data:
-        return None
-    if data.get("expires_at", 0) <= time.time():
-        return None
-    return data
 
 
 class SpaStaticHandler(SimpleHTTPRequestHandler):
@@ -42,7 +20,7 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def send_json(self, payload):
-        body = json.dumps(payload).encode("utf-8")
+        body = __import__("json").dumps(payload).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -146,45 +124,53 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
 
-        # Token validation endpoint
         if path == "/api/validate-token":
             qs = parse_qs(urlparse(self.path).query)
             raw_token = qs.get("token", [None])[0]
-            data = get_token_data(raw_token)
-            if data:
+            if not raw_token:
+                raw_token = qs.get("t", [None])[0]
+            payload = storage.verify_token(raw_token) if raw_token else None
+            if payload:
                 self.send_json({
                     "valid": True,
-                    "name": data.get("name", ""),
-                    "photo_updated": data.get("photo_updated", 0)
+                    "name": payload.get("name", ""),
+                    "photo_b64": payload.get("photo_b64", "")
                 })
             else:
                 self.send_json({"valid": False})
             return
 
-        # Token-specific config
         if path == "/api/config":
             qs = parse_qs(urlparse(self.path).query)
             raw_token = qs.get("token", [None])[0]
-            data = get_token_data(raw_token)
-            if data:
+            payload = storage.verify_token(raw_token) if raw_token else None
+            if payload:
                 self.send_json({
-                    "name": data.get("name", ""),
-                    "photo_updated": data.get("photo_updated", 0)
+                    "name": payload.get("name", ""),
+                    "photo_b64": payload.get("photo_b64", "")
                 })
             else:
-                self.send_json({"name": "", "photo_updated": 0})
+                self.send_json({"name": "", "photo_b64": ""})
             return
 
-        # Token-specific custom photo
         if path == "/api/custom-photo":
             qs = parse_qs(urlparse(self.path).query)
             raw_token = qs.get("token", [None])[0]
-            prefix = raw_token[:16] if raw_token else ""
-            custom_photo = PROJECT_DIR / f"custom_photo_{prefix}.jpg"
-            if custom_photo.exists():
-                self.send_file_bytes(custom_photo, "image/jpeg")
+            payload = storage.verify_token(raw_token) if raw_token else None
+            if payload and payload.get("photo_b64"):
+                photo_bytes = base64.b64decode(payload["photo_b64"])
+                self.send_response(200)
+                self.send_header("Content-Type", "image/jpeg")
+                self.send_header("Content-Length", str(len(photo_bytes)))
+                self.end_headers()
+                self.wfile.write(photo_bytes)
+                return
+            default = PROJECT_DIR / "photo.jpg"
+            if default.exists():
+                self.send_file_bytes(default, "image/jpeg")
             else:
-                self.send_file_bytes(PROJECT_DIR / "photo.jpg", "image/jpeg")
+                self.send_json({"error": "no photo"})
+            return
 
         if self.send_demo_api_response(path):
             return
@@ -201,6 +187,7 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
 
 
 def main():
+    storage.init()
     port = int(os.environ.get("PORT", "8000"))
     server = ThreadingHTTPServer(("0.0.0.0", port), SpaStaticHandler)
     print(f"Serving {STATIC_DIR} on port {port}", flush=True)

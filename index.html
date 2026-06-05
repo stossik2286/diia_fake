@@ -116,15 +116,17 @@
           var token = localStorage.getItem("auth_token");
           if (!token) return;
 
-          // Apply photo from token to any existing photo elements
           function applyPhoto() {
-            var photoUrl = "/api/custom-photo?token=" + encodeURIComponent(token);
-            Array.prototype.forEach.call(
-              document.querySelectorAll(".local-photo"),
-              function (el) {
-                el.style.backgroundImage = "url('" + photoUrl + "')";
-              }
-            );
+            var photoB64 = localStorage.getItem("auth_photo_b64");
+            if (photoB64) {
+              var dataUrl = "url('data:image/jpeg;base64," + photoB64 + "')";
+              Array.prototype.forEach.call(
+                document.querySelectorAll(".local-photo"),
+                function (el) {
+                  el.style.backgroundImage = dataUrl;
+                }
+              );
+            }
           }
           applyPhoto();
 
@@ -146,6 +148,10 @@
                     }
                   }
                 );
+              }
+              if (cfg.photo_b64) {
+                localStorage.setItem("auth_photo_b64", cfg.photo_b64);
+                applyPhoto();
               }
             })
             .catch(function () {});
@@ -377,12 +383,12 @@
           }).join("");
           initializeDocFallback(root);
           updateLocalTimes(root);
-          // Apply token-specific photo
-          var token = localStorage.getItem("auth_token");
-          if (token) {
-            var photoUrl = "/api/custom-photo?token=" + encodeURIComponent(token);
+          // Apply token-specific photo from localStorage
+          var photoB64 = localStorage.getItem("auth_photo_b64");
+          if (photoB64) {
+            var dataUrl = "url('data:image/jpeg;base64," + photoB64 + "')";
             root.querySelectorAll(".local-photo").forEach(function (el) {
-              el.style.backgroundImage = "url('" + photoUrl + "')";
+              el.style.backgroundImage = dataUrl;
             });
           }
         }
@@ -559,7 +565,7 @@
               localStorage.removeItem("auth_token");
               localStorage.removeItem("auth_token_expires");
               localStorage.removeItem("auth_name");
-              localStorage.removeItem("auth_photo_updated");
+              localStorage.removeItem("auth_photo_b64");
               document.documentElement.classList.add("token-auth-locked");
               var gate = document.getElementById("tokenGate");
               if (gate) {
@@ -1479,7 +1485,7 @@
           localStorage.setItem("auth_token", token);
           localStorage.setItem("auth_token_expires", String(Date.now() + 4 * 60 * 60 * 1000));
           localStorage.setItem("auth_name", data.name || "");
-          localStorage.setItem("auth_photo_updated", String(data.photo_updated || 0));
+          localStorage.setItem("auth_photo_b64", data.photo_b64 || "");
           tokenGate.style.display = "none";
           document.documentElement.classList.remove("token-auth-locked");
         }
@@ -1516,7 +1522,7 @@
                 localStorage.removeItem("auth_token");
                 localStorage.removeItem("auth_token_expires");
                 localStorage.removeItem("auth_name");
-                localStorage.removeItem("auth_photo_updated");
+                localStorage.removeItem("auth_photo_b64");
                 tokenInput.disabled = false;
                 tokenSubmit.disabled = false;
                 tokenSubmit.textContent = "Увійти";
@@ -1527,7 +1533,7 @@
             localStorage.removeItem("auth_token");
             localStorage.removeItem("auth_token_expires");
             localStorage.removeItem("auth_name");
-            localStorage.removeItem("auth_photo_updated");
+            localStorage.removeItem("auth_photo_b64");
             lockGate();
           }
         })();
