@@ -1,1 +1,0 @@
-# This project serves a static site with Python's standard library.
