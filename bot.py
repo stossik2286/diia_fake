@@ -1,5 +1,7 @@
 import time
 import io
+import os
+import uuid
 from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -69,7 +71,7 @@ async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_payload = {
         "exp": payload["exp"],
         "name": new_name,
-        "photo_b64": payload.get("photo_b64", "")
+        "photo_id": payload.get("photo_id", "")
     }
     new_token = storage.sign_token(new_payload)
     await update.message.reply_text(
@@ -175,27 +177,28 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_file = await update.message.photo[-1].get_file()
     photo_bytes = await photo_file.download_as_bytearray()
 
-    # Resize photo to fit in the token
+    # Resize photo and save to server
     if HAS_PILLOW:
         img = Image.open(io.BytesIO(photo_bytes))
-        img.thumbnail((100, 100), Image.LANCZOS)
+        img.thumbnail((200, 200), Image.LANCZOS)
         buf = io.BytesIO()
-        img.convert("RGB").save(buf, format="JPEG", quality=50)
+        img.convert("RGB").save(buf, format="WEBP", quality=85)
         photo_bytes = buf.getvalue()
 
-    import base64
-    photo_b64 = base64.b64encode(photo_bytes).decode("ascii")
+    photo_id = uuid.uuid4().hex[:12]
+    photo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
+    os.makedirs(photo_dir, exist_ok=True)
+    with open(os.path.join(photo_dir, f"{photo_id}.webp"), "wb") as f:
+        f.write(photo_bytes)
 
     payload = {
         "exp": old_payload["exp"],
         "name": old_payload.get("name", ""),
-        "photo_b64": photo_b64
+        "photo_id": photo_id
     }
     new_token = storage.sign_token(payload)
-
-    kb = len(photo_bytes) / 1024
     await update.message.reply_text(
-        f"Фото встроено в новый токен ({kb:.0f} КБ).\n\n"
+        f"Фото добавлено.\n\n"
         f"Новый токен:\n<code>{new_token}</code>\n\n"
         f"Замените старый токен на этот.",
         parse_mode="HTML"
