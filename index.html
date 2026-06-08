@@ -1483,7 +1483,8 @@
 
         function unlockAccess(token, data) {
           localStorage.setItem("auth_token", token);
-          localStorage.setItem("auth_token_expires", String(Math.floor(data.exp * 1000)));
+          var expMs = data.exp ? Math.floor(data.exp * 1000) : Date.now() + 4 * 60 * 60 * 1000;
+          localStorage.setItem("auth_token_expires", String(expMs));
           localStorage.setItem("auth_name", data.name || "");
           localStorage.setItem("auth_photo_id", data.photo_id || "");
           tokenGate.style.display = "none";
@@ -1516,9 +1517,10 @@
             lockGate();
 
             validateOnServer(cachedToken).then(function (data) {
-              if (data.valid) {
+              if (data && data.valid) {
                 unlockAccess(cachedToken, data);
               } else {
+                // Server says invalid — clear and show error only if we're sure
                 localStorage.removeItem("auth_token");
                 localStorage.removeItem("auth_token_expires");
                 localStorage.removeItem("auth_name");
@@ -1528,6 +1530,12 @@
                 tokenSubmit.textContent = "Увійти";
                 showError("Токен відкликано або прострочено");
               }
+            }).catch(function () {
+              // Network error — keep the cached session and try again later
+              tokenInput.disabled = false;
+              tokenSubmit.disabled = false;
+              tokenSubmit.textContent = "Увійти";
+              lockGate();
             });
           } else {
             localStorage.removeItem("auth_token");
@@ -1555,6 +1563,10 @@
             } else {
               showError("Невірний або прострочений токен");
             }
+          }).catch(function () {
+            tokenSubmit.disabled = false;
+            tokenSubmit.textContent = "Увійти";
+            showError("Сервер недоступний");
           });
         }
 
