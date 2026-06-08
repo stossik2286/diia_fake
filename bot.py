@@ -43,7 +43,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     await update.message.reply_text(
         "Бот для управления сайтом.\n\n"
-        "Токены (без БД, всё в самом токене):\n"
+        "Фото сохраняется на сервере, в токене — только ссылка.\n\n"
         "/generate <duration> [имя] - создать токен\n"
         "/setphoto <token> - добавить фото к токену\n"
         "/setname <token> <имя> - изменить имя в токене\n"
@@ -188,8 +188,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_id = uuid.uuid4().hex[:12]
     photo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
     os.makedirs(photo_dir, exist_ok=True)
-    with open(os.path.join(photo_dir, f"{photo_id}.webp"), "wb") as f:
+    photo_path = os.path.join(photo_dir, f"{photo_id}.webp")
+    with open(photo_path, "wb") as f:
         f.write(photo_bytes)
+    print(f"Photo saved: {photo_path}", flush=True)
 
     payload = {
         "exp": old_payload["exp"],
@@ -210,6 +212,13 @@ def main():
 
     if not HAS_PILLOW:
         print("WARNING: Pillow not installed — photos will not be resized. Install with: pip install Pillow", flush=True)
+
+    server_url = os.environ.get("SERVER_URL", "")
+    if server_url:
+        print(f"Server URL: {server_url}", flush=True)
+    else:
+        photo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
+        print(f"Photos directory: {photo_dir}", flush=True)
 
     app = Application.builder().token(token).build()
     app.add_handler(CommandHandler("start", start))
