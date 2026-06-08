@@ -180,7 +180,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Resize photo and save to server
     if HAS_PILLOW:
         img = Image.open(io.BytesIO(photo_bytes))
-        img.thumbnail((200, 200), Image.LANCZOS)
+        img.thumbnail((400, 400), Image.LANCZOS)
         buf = io.BytesIO()
         img.convert("RGB").save(buf, format="JPEG", quality=95)
         photo_bytes = buf.getvalue()
