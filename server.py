@@ -1,11 +1,12 @@
 import os
-import base64
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 import storage
 
 PROJECT_DIR = Path(__file__).resolve().parent
+PHOTO_DIR = PROJECT_DIR / "photos"
+PHOTO_DIR.mkdir(exist_ok=True)
 NESTED_STATIC_DIR = PROJECT_DIR / "my_site_copy" / "my.funpapers.net"
 STATIC_DIR = PROJECT_DIR if (PROJECT_DIR / "index.html").exists() else NESTED_STATIC_DIR
 LOCAL_ASSET_DIR = PROJECT_DIR / "project-main"
@@ -124,6 +125,19 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
 
+        if path.startswith("/api/photo/"):
+            photo_id = path[len("/api/photo/"):]
+            photo_path = PHOTO_DIR / f"{photo_id}.webp"
+            if photo_path.exists():
+                self.send_file_bytes(photo_path, "image/webp")
+            else:
+                default = PROJECT_DIR / "photo.jpg"
+                if default.exists():
+                    self.send_file_bytes(default, "image/jpeg")
+                else:
+                    self.send_json({"error": "no photo"})
+            return
+
         if path == "/api/validate-token":
             qs = parse_qs(urlparse(self.path).query)
             raw_token = qs.get("token", [None])[0]
@@ -134,8 +148,7 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
                 self.send_json({
                     "valid": True,
                     "name": payload.get("name", ""),
-                    "photo_b64": payload.get("photo_b64", ""),
-                    "exp": payload["exp"]
+                    "photo_id": payload.get("photo_id", "")
                 })
             else:
                 self.send_json({"valid": False})
@@ -148,29 +161,10 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
             if payload:
                 self.send_json({
                     "name": payload.get("name", ""),
-                    "photo_b64": payload.get("photo_b64", "")
+                    "photo_id": payload.get("photo_id", "")
                 })
             else:
-                self.send_json({"name": "", "photo_b64": ""})
-            return
-
-        if path == "/api/custom-photo":
-            qs = parse_qs(urlparse(self.path).query)
-            raw_token = qs.get("token", [None])[0]
-            payload = storage.verify_token(raw_token) if raw_token else None
-            if payload and payload.get("photo_b64"):
-                photo_bytes = base64.b64decode(payload["photo_b64"])
-                self.send_response(200)
-                self.send_header("Content-Type", "image/jpeg")
-                self.send_header("Content-Length", str(len(photo_bytes)))
-                self.end_headers()
-                self.wfile.write(photo_bytes)
-                return
-            default = PROJECT_DIR / "photo.jpg"
-            if default.exists():
-                self.send_file_bytes(default, "image/jpeg")
-            else:
-                self.send_json({"error": "no photo"})
+                self.send_json({"name": "", "photo_id": ""})
             return
 
         if self.send_demo_api_response(path):
