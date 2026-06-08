@@ -1,4 +1,5 @@
 import os
+import uuid
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -121,6 +122,18 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
             return True
 
         return False
+
+    def do_POST(self):
+        path = urlparse(self.path).path
+        if path == "/api/upload-photo":
+            length = int(self.headers.get("Content-Length", 0))
+            photo_bytes = self.rfile.read(length)
+            photo_id = uuid.uuid4().hex[:12]
+            (PHOTO_DIR / f"{photo_id}.webp").write_bytes(photo_bytes)
+            self.send_json({"photo_id": photo_id})
+            return
+        self.send_response(404)
+        self.end_headers()
 
     def do_GET(self):
         path = urlparse(self.path).path
