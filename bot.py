@@ -182,13 +182,13 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         img = Image.open(io.BytesIO(photo_bytes))
         img.thumbnail((200, 200), Image.LANCZOS)
         buf = io.BytesIO()
-        img.convert("RGB").save(buf, format="WEBP", quality=85)
+        img.convert("RGB").save(buf, format="JPEG", quality=95)
         photo_bytes = buf.getvalue()
 
     photo_id = uuid.uuid4().hex[:12]
     photo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
     os.makedirs(photo_dir, exist_ok=True)
-    photo_path = os.path.join(photo_dir, f"{photo_id}.webp")
+    photo_path = os.path.join(photo_dir, f"{photo_id}.jpg")
     with open(photo_path, "wb") as f:
         f.write(photo_bytes)
     print(f"Photo saved: {photo_path}", flush=True)

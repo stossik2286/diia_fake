@@ -127,9 +127,9 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
 
         if path.startswith("/api/photo/"):
             photo_id = path[len("/api/photo/"):]
-            photo_path = PHOTO_DIR / f"{photo_id}.webp"
+            photo_path = PHOTO_DIR / f"{photo_id}.jpg"
             if photo_path.exists():
-                self.send_file_bytes(photo_path, "image/webp")
+                self.send_file_bytes(photo_path, "image/jpeg")
             else:
                 default = PROJECT_DIR / "photo.jpg"
                 if default.exists():
