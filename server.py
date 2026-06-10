@@ -148,7 +148,8 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
                 self.send_json({
                     "valid": True,
                     "name": payload.get("name", ""),
-                    "photo_id": payload.get("photo_id", "")
+                    "photo_id": payload.get("photo_id", ""),
+                    "exp": payload["exp"]
                 })
             else:
                 self.send_json({"valid": False})
