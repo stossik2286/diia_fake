@@ -78,7 +78,7 @@
           sign: "demo",
           photo: "demo",
           renewed: "DEMO",
-          barcode: "DEMO",
+          barcode: "6131  9453  07672",
           passport_start: "01.01.2000",
           passport_end: "01.01.2099",
           get_organ: "DEMO",
@@ -142,7 +142,7 @@
                   document.querySelectorAll(".local-profile-name-el"),
                   function (el) {
                     if (el.closest(".local-feed-hello")) {
-                      el.textContent = localProfileName.split(" ")[0];
+                      el.textContent = localProfileName.split(" ")[1] || localProfileName;
                     } else {
                       el.innerHTML = localProfileName.replace(/ /g, "<br>");
                     }
@@ -285,10 +285,12 @@
                 '<section class="local-doc-card local-tax-card">' +
                   '<div class="local-doc-title">Картка платника податків</div>' +
                   '<div class="local-tax-label">РНОКПП</div>' +
+'<div class="local-tax-fio">' + localProfileName.replace(/ /g, "<br>") + '</div>' +
+'<div class="local-tax-data">Дата народження:<br>20.09.2007</div>' +
                   '<div class="local-tax-space"></div>' +
-                  '<div class="local-marquee"><span>РНОКПП дійсний &bull; Перевірено Державною податковою службою</span></div>' +
+                  '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; </span></div>' +
                   '<div class="local-doc-bottom">' +
-                    '<h2>3857109110</h2>' +
+                    '<h2 style="display:flex;align-items:center;gap:6px">4044006296 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 13.5L13 13.5C13.2761 13.5 13.5 13.2761 13.5 13L13.5 6C13.5 5.72386 13.2761 5.5 13 5.5L6 5.5C5.72386 5.5 5.5 5.72386 5.5 6L5.5 13C5.5 13.2761 5.72386 13.5 6 13.5ZM13 15C14.1046 15 15 14.1046 15 13L15 6C15 4.89543 14.1046 4 13 4L6 4C4.89543 4 4 4.89543 4 6L4 13C4 14.1046 4.89543 15 6 15L13 15Z" fill="black"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5L11 18.5C10.7239 18.5 10.5 18.2761 10.5 18V16H9V18C9 19.1046 9.89543 20 11 20H18C19.1046 20 20 19.1046 20 18V11C20 9.89543 19.1046 9 18 9H16V10.5H18C18.2761 10.5 18.5 10.7239 18.5 11L18.5 18C18.5 18.2761 18.2761 18.5 18 18.5Z" fill="black"/></svg></h2>' +
                     '<button class="local-more" type="button" aria-label="Більше">...</button>' +
                   '</div>' +
                 '</section>' +
@@ -329,6 +331,30 @@
                           '<span class="local-qr-icon local-qr-icon-bar" aria-hidden="true"></span>' +
                           '<span>Штрихкод</span>' +
                         '</button>' +
+                      '</div>' +
+                    '</div>' +
+                  '</div>' +
+                '</section>' +
+                '<section class="local-doc-card local-passport-card">' +
+                  '<div class="local-card-inner">' +
+                    '<div class="local-card-face local-card-front">' +
+                      '<div class="local-doc-title">єДокумент</div>' +
+                      '<div class="local-doc-mid">' +
+                        '<div class="local-photo"></div>' +
+                        '<div class="local-doc-info">' +
+                          '<p>Дата<br>народження:<br>20.09.2007</p>' +
+                          '<p>РНОКПП:<br>4044006296</p>' +
+                        '</div>' +
+                      '</div>' +
+                      '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b></span></div>' +
+                      '<div class="local-doc-bottom">' +
+                        '<h2 class="local-profile-name-el">' + localProfileName.replace(/ /g, "<br>") + '</h2>' +
+                        '<button class="local-more" type="button" aria-label="Більше">...</button>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="local-card-face local-card-back" aria-hidden="true">' +
+                      '<div class="local-qr-panel">' +
+                        '<div class="local-qr-image" role="img" aria-label="QR code"></div>' +
                       '</div>' +
                     '</div>' +
                   '</div>' +
@@ -409,7 +435,7 @@
           root.dataset.mode = "news";
           root.innerHTML =
             '<div class="local-feed-screen">' +
-              '<h1 class="local-feed-hello">Привіт, <span class="local-profile-name-el">' + localProfileName.split(" ")[0] + '</span> <span>👋</span></h1>' +
+              '<h1 class="local-feed-hello">Привіт, <span class="local-profile-name-el">' + (localProfileName.split(" ")[1] || localProfileName) + ' 👋</span></h1>' +
               '<section class="local-feed-resilience"><div><h2>Незламність</h2><p>Мапа укриттів, Пунктів незламності та відділень Power Banking. Заява про відсутній зв’язок.</p><div class="local-feed-mini-icons"><span class="shield"></span><span class="bolt"></span><span class="bank"></span></div></div><button type="button" class="local-feed-arrow local-feed-arrow--black" aria-label="Відкрити"></button></section>' +
               '<div class="local-feed-actions"><button type="button"><span class="local-feed-action-ico scan"></span><span>Дія<br>Сканер</span></button><button type="button"><span class="local-feed-action-ico trident"></span><span>Військові<br>облігації</span></button><button type="button"><span class="local-feed-action-ico tower"></span><span>Відсутній<br>зв’язок</span></button></div>' +
               '<section class="local-feed-drone"><div class="local-feed-drone-art"><span class="local-feed-drone-logo"></span><strong>ЛІНІЯ<br>ДРОНІВ</strong></div><div class="local-feed-drone-bottom"><span>Змінити хід подій</span><button type="button" class="local-feed-arrow local-feed-arrow--white" aria-label="Відкрити"></button></div></section>' +
@@ -435,7 +461,7 @@
                 '<article class="local-ai-message">' +
                   '<span class="local-ai-star" aria-hidden="true"></span>' +
                   '<div class="local-ai-copy">' +
-                    '<p class="local-ai-greeting">Привіт, ' + localProfileName.split(" ")[0] + '.</p>' +
+                    '<p class="local-ai-greeting">Привіт, ' + (localProfileName.split(" ")[1] || localProfileName) + '.</p>' +
                     '<p>Ставте запитання — я допоможу розібратись будь з чим.</p>' +
                     '<p>Не знаєте, що спитати? Можете замовити витяг про місце проживання через чат.</p>' +
                     '<div class="local-ai-actions"><span class="local-ai-like"></span><span class="local-ai-dislike"></span><span class="local-ai-copy-ico"></span></div>' +
@@ -984,83 +1010,169 @@
         }
 
         function setupPassportFlip(root) {
-          var passportCard = root.querySelector(".local-passport-card");
-          if (!passportCard || passportCard.__qrBound) return;
-          passportCard.__qrBound = true;
+          var cards = root.querySelectorAll(".local-passport-card");
+          cards.forEach(function (passportCard) {
+            if (passportCard.__qrBound) return;
+            passportCard.__qrBound = true;
 
-          var timerId = null;
-          var endAt = 0;
-          var ttlNode = passportCard.querySelector("[data-local-qr-ttl]");
+            var timerId = null;
+            var endAt = 0;
+            var ttlNode = passportCard.querySelector("[data-local-qr-ttl]");
 
-          function formatSeconds(seconds) {
-            var value = Math.max(0, Math.floor(seconds));
-            var minutes = Math.floor(value / 60);
-            var secs = value % 60;
-            return minutes + ":" + (secs < 10 ? "0" + secs : secs);
-          }
-
-          function renderTtl() {
-            if (!ttlNode) return;
-            var remaining = Math.max(0, endAt - Date.now());
-            ttlNode.textContent = formatSeconds(remaining / 1000);
-          }
-
-          function stopTimer(reset) {
-            if (timerId) {
-              clearInterval(timerId);
-              timerId = null;
+            function formatSeconds(seconds) {
+              var value = Math.max(0, Math.floor(seconds));
+              var minutes = Math.floor(value / 60);
+              var secs = value % 60;
+              return minutes + ":" + (secs < 10 ? "0" + secs : secs);
             }
-            if (reset) {
-              endAt = 0;
-              if (ttlNode) ttlNode.textContent = "3:00";
-            }
-          }
 
-          function startTimer() {
-            stopTimer(false);
-            endAt = Date.now() + 3 * 60 * 1000;
-            renderTtl();
-            timerId = setInterval(function () {
-              renderTtl();
-              if (Date.now() >= endAt) {
-                stopTimer(false);
+            function renderTtl() {
+              if (!ttlNode) return;
+              var remaining = Math.max(0, endAt - Date.now());
+              ttlNode.textContent = formatSeconds(remaining / 1000);
+            }
+
+            function stopTimer(reset) {
+              if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
               }
-            }, 250);
-          }
-
-          passportCard.addEventListener("click", function (event) {
-            // Ignore clicks while user drags the slider.
-            var slider = root.querySelector(".local-docs");
-            if (slider && slider.classList.contains("is-dragging")) return;
-
-            var tabButton = event.target && event.target.closest && event.target.closest("button[data-local-qr-tab]");
-            if (tabButton) {
-              event.preventDefault();
-              event.stopPropagation();
-              var tab = tabButton.getAttribute("data-local-qr-tab");
-              updatePassportBackTab(passportCard, tab);
-              root.dispatchEvent(new CustomEvent("local-docs:relayout"));
-              return;
+              if (reset) {
+                endAt = 0;
+                if (ttlNode) ttlNode.textContent = "3:00";
+              }
             }
 
-            var willOpen = !passportCard.classList.contains("is-flipped");
-            passportCard.classList.add("is-flipping");
-            passportCard.classList.toggle("is-flipped");
-            root.dispatchEvent(new CustomEvent("local-docs:relayout"));
-            setTimeout(function () {
-              passportCard.classList.remove("is-flipping");
-            }, 480);
-            if (willOpen) {
-              startTimer();
-            } else {
-              stopTimer(true);
+            function startTimer() {
+              stopTimer(false);
+              endAt = Date.now() + 3 * 60 * 1000;
+              renderTtl();
+              timerId = setInterval(function () {
+                renderTtl();
+                if (Date.now() >= endAt) {
+                  stopTimer(false);
+                }
+              }, 250);
+            }
+
+            passportCard.addEventListener("click", function (event) {
+              var slider = root.querySelector(".local-docs");
+              if (slider && slider.classList.contains("is-dragging")) return;
+
+              var tabButton = event.target && event.target.closest && event.target.closest("button[data-local-qr-tab]");
+              if (tabButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                var tab = tabButton.getAttribute("data-local-qr-tab");
+                updatePassportBackTab(passportCard, tab);
+                root.dispatchEvent(new CustomEvent("local-docs:relayout"));
+                return;
+              }
+
+              var willOpen = !passportCard.classList.contains("is-flipped");
+              passportCard.classList.add("is-flipping");
+              passportCard.classList.toggle("is-flipped");
+              root.dispatchEvent(new CustomEvent("local-docs:relayout"));
+              setTimeout(function () {
+                passportCard.classList.remove("is-flipping");
+              }, 480);
+              if (willOpen) {
+                startTimer();
+              } else {
+                stopTimer(true);
+              }
+            });
+
+            if (ttlNode && !ttlNode.textContent) {
+              ttlNode.textContent = "3:00";
             }
           });
+        }
 
-          // Initial state
-          if (ttlNode && !ttlNode.textContent) {
-            ttlNode.textContent = "3:00";
+        function renderBarcode(canvas, text) {
+          var code128B = {
+            ' ':0,'!':1,'"':2,'#':3,'$':4,'%':5,'&':6,"'":7,
+            '(':8,')':9,'*':10,'+':11,',':12,'-':13,'.':14,'/':15,
+            '0':16,'1':17,'2':18,'3':19,'4':20,'5':21,'6':22,'7':23,
+            '8':24,'9':25,':':26,';':27,'<':28,'=':29,'>':30,'?':31,
+            '@':32,'A':33,'B':34,'C':35,'D':36,'E':37,'F':38,'G':39,
+            'H':40,'I':41,'J':42,'K':43,'L':44,'M':45,'N':46,'O':47,
+            'P':48,'Q':49,'R':50,'S':51,'T':52,'U':53,'V':54,'W':55,
+            'X':56,'Y':57,'Z':58,'[':59,'\\':60,']':61,'^':62,'_':63,
+            '`':64,'a':65,'b':66,'c':67,'d':68,'e':69,'f':70,'g':71,
+            'h':72,'i':73,'j':74,'k':75,'l':76,'m':77,'n':78,'o':79,
+            'p':80,'q':81,'r':82,'s':83,'t':84,'u':85,'v':86,'w':87,
+            'x':88,'y':89,'z':90,'{':91,'|':92,'}':93,'~':94
+          };
+          var patterns = [
+            [2,1,2,2,2,2],[2,2,2,1,2,2],[2,2,2,2,2,1],[1,2,1,2,2,3],[1,2,1,3,2,2],
+            [1,3,1,2,2,2],[1,2,2,2,1,3],[1,2,2,3,1,2],[1,3,2,2,1,2],[2,2,1,2,1,3],
+            [2,2,1,3,1,2],[2,3,1,2,1,2],[1,1,2,2,3,2],[1,2,2,1,3,2],[1,2,2,2,3,1],
+            [1,1,3,2,2,2],[1,2,3,1,2,2],[1,2,3,2,2,1],[2,2,3,2,1,1],[2,2,1,1,3,2],
+            [2,2,1,2,3,1],[2,1,3,2,1,2],[2,2,3,1,1,2],[3,1,2,1,3,1],[3,1,1,2,2,2],
+            [3,2,1,1,2,2],[3,2,1,2,2,1],[3,1,2,2,1,2],[3,2,2,1,1,2],[3,2,2,2,1,1],
+            [2,1,2,1,2,3],[2,1,2,3,2,1],[2,3,2,1,2,1],[1,1,1,3,2,3],[1,3,1,1,2,3],
+            [1,3,1,3,2,1],[1,1,2,3,1,3],[1,3,2,1,1,3],[1,3,2,3,1,1],[2,1,1,3,1,3],
+            [2,3,1,1,1,3],[2,3,1,3,1,1],[1,1,2,1,3,3],[1,1,2,3,3,1],[1,3,2,1,3,1],
+            [1,1,3,1,2,3],[1,1,3,3,2,1],[1,3,3,1,2,1],[3,1,3,1,2,1],[2,1,1,3,3,1],
+            [2,3,1,1,3,1],[2,1,3,1,1,3],[2,1,3,3,1,1],[2,1,3,1,3,1],[3,1,1,1,2,3],
+            [3,1,1,3,2,1],[3,3,1,1,2,1],[3,1,2,1,1,3],[3,1,2,3,1,1],[3,3,2,1,1,1],
+            [3,1,4,1,1,1],[2,2,1,4,1,1],[4,3,1,1,1,1],[1,1,1,2,2,4],[1,1,1,4,2,2],
+            [1,2,1,1,2,4],[1,2,1,4,2,1],[1,4,1,1,2,1],[1,1,2,2,1,4],[1,1,2,4,1,2],
+            [1,2,2,1,1,4],[1,2,2,4,1,1],[1,4,2,1,1,2],[1,4,2,2,1,1],[2,4,1,2,1,1],
+            [2,2,1,1,1,4],[4,1,3,1,1,1],[2,4,1,1,1,2],[1,3,4,1,1,1],[1,1,1,2,4,2],
+            [1,2,1,1,4,2],[1,2,1,2,4,1],[1,1,4,2,1,2],[1,2,4,1,1,2],[1,2,4,2,1,1],
+            [4,1,1,2,1,2],[4,2,1,1,1,2],[4,2,1,2,1,1],[2,1,2,1,4,1],[2,1,4,1,2,1],
+            [4,1,2,1,2,1],[1,1,1,1,4,3],[1,1,1,3,4,1],[1,3,1,1,4,1],[1,1,4,1,1,3],
+            [1,1,4,3,1,1],[4,1,1,1,1,3],[4,1,1,3,1,1],[1,1,3,1,4,1],[1,1,4,1,3,1],
+            [3,1,1,1,4,1],[4,1,1,1,3,1],[2,1,1,4,1,2],[2,1,1,2,1,3],[2,1,1,2,3,2]
+          ];
+          var stop = [2,3,3,1,1,1,2];
+          var digits = text.replace(/\s/g, "");
+          var encoded = [patterns[104]];
+          var checksum = 104;
+          for (var i = 0; i < digits.length; i++) {
+            var val = code128B[digits[i]];
+            if (val === undefined) val = 0;
+            encoded.push(patterns[val]);
+            checksum += val * (i + 1);
           }
+          encoded.push(patterns[checksum % 103]);
+          encoded.push(stop);
+          var totalModules = 0;
+          for (var i = 0; i < encoded.length; i++) {
+            for (var j = 0; j < encoded[i].length; j++) {
+              totalModules += encoded[i][j];
+            }
+          }
+          var dpr = window.devicePixelRatio || 1;
+          var cssW = canvas.width / dpr;
+          var cssH = canvas.height / dpr;
+          var textHeight = Math.round(cssH * 0.2);
+          var barHeight = cssH - textHeight;
+          var moduleWidth = canvas.width / totalModules;
+          if (moduleWidth < 1) moduleWidth = 1;
+          var ctx = canvas.getContext("2d");
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, cssW, cssH);
+          var x = 0;
+          for (var i = 0; i < encoded.length; i++) {
+            var row = encoded[i];
+            for (var j = 0; j < row.length; j++) {
+              var w = Math.round(row[j] * moduleWidth);
+              if (j % 2 === 0) {
+                ctx.fillStyle = "#000";
+                ctx.fillRect(x, 0, w, barHeight);
+              }
+              x += w;
+            }
+          }
+          ctx.fillStyle = "#000";
+          ctx.font = Math.round(textHeight * 0.55) + "px e-UkraineLocal, Arial, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(text, cssW / 2, cssH - textHeight / 2);
         }
 
         function updatePassportBackTab(card, tab) {
@@ -1068,13 +1180,29 @@
           buttons.forEach(function (button) {
             button.classList.toggle("is-active", button.getAttribute("data-local-qr-tab") === tab);
           });
-          // Placeholder: when you add real barcode image, swap background here.
           var qr = card.querySelector(".local-qr-image");
           if (!qr) return;
           if (tab === "barcode") {
-            qr.style.backgroundImage = 'linear-gradient(90deg,#000 0 8%,transparent 8% 14%,#000 14% 22%,transparent 22% 28%,#000 28% 36%,transparent 36% 42%,#000 42% 52%,transparent 52% 60%,#000 60% 68%,transparent 68% 74%,#000 74% 82%,transparent 82% 90%,#000 90% 100%)';
-            qr.style.backgroundSize = "cover";
+            qr.classList.add("local-qr-image--barcode");
+            var canvas = qr.querySelector("canvas");
+            if (!canvas) {
+              canvas = document.createElement("canvas");
+              qr.textContent = "";
+              qr.appendChild(canvas);
+            }
+            var barcodeText = "6 1 3 1 ⁢  9 4 5 3 ⁢  0 7 6 7 2";
+            var dpr = window.devicePixelRatio || 1;
+            var cssWidth = qr.clientWidth || 290;
+            canvas.style.display = "block";
+            canvas.style.width = cssWidth + "px";
+            canvas.style.height = "auto";
+            canvas.width = Math.round(cssWidth * dpr);
+            canvas.height = Math.round(canvas.width * 0.45);
+            renderBarcode(canvas, barcodeText);
           } else {
+            qr.classList.remove("local-qr-image--barcode");
+            var canvas = qr.querySelector("canvas");
+            if (canvas) canvas.remove();
             qr.style.backgroundImage = 'url("https://i.imgur.com/9aRH1Vs.png")';
             qr.style.backgroundSize = "contain";
           }
@@ -1220,7 +1348,9 @@
       .local-doc-card .local-more:before{width:16px;height:4px;background:radial-gradient(circle at 2.2px 50%,#fff 0 1.5px,transparent 1.7px),radial-gradient(circle at 8px 50%,#fff 0 1.5px,transparent 1.7px),radial-gradient(circle at 13.8px 50%,#fff 0 1.5px,transparent 1.7px)}
       .local-doc-card .local-doc-bottom h2{max-width:calc(100% - 46px)}
       .local-tax-card{background:rgba(244,248,255,.39)}
-      .local-tax-label{font-size:18px;margin-top:-20px;color:#303030}
+      .local-tax-label{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:17px;margin-top:-20px;margin-bottom:18px;color:#303030}
+      .local-tax-fio{font-size:13px;margin-bottom:14px;color:#303030}
+      .local-tax-data{font-size:13px;color:#303030}
       .local-tax-space{flex:1}
       .local-add-card,.local-service-card{background:rgba(244,248,255,.39);justify-content:space-between}
       .local-add-card p,.local-service-card p{font-size:clamp(15px,4.6vw,18px);line-height:1.32;margin:0}
@@ -1242,8 +1372,8 @@
       .local-feed-card h2{font-size:20px;line-height:1.2;margin:0 0 8px;font-weight:600;letter-spacing:0}
       .local-feed-card p{font-size:15px;line-height:1.45;margin:0}
       .local-feed-screen{height:100%;overflow:auto;padding:clamp(58px,8svh,86px) clamp(18px,5.2vw,26px) 26px;box-sizing:border-box;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat;color:#050505}
-      .local-feed-hello{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(34px,8.5vw,44px);line-height:1.05;font-weight:400;margin:0 0 clamp(24px,4.7svh,38px);letter-spacing:0}
-      .local-feed-hello span{font-family:Arial,sans-serif}
+      .local-feed-hello{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(26px,7.5vw,38px);line-height:1.00;font-weight:210;margin:0 0 clamp(22px,4.5svh,36px);letter-spacing:0}
+      .local-feed-hello span{font-family:Arial,sans-serif;font-weight:150}
       .local-feed-resilience{height:90px;min-height:clamp(148px,35vw,182px);border-radius:22px;background:rgba(255,255,255,.58);padding:clamp(18px,4.4vw,24px);box-sizing:border-box;display:flex;justify-content:space-between;gap:16px;margin-bottom:clamp(34px,6.2svh,48px)}
       .local-feed-resilience h2{font-size:18px;font-weight:150}
       .local-feed-resilience p{font-size:12px;font-weight:50}
@@ -1416,31 +1546,34 @@
       @media (max-width:360px){.local-doc-card{flex-basis:86vw}.local-doc-title{font-size:clamp(18px,5.6vw,22px)}.local-doc-info{font-size:clamp(12px,3.5vw,14px)}.local-doc-info p{margin-bottom:clamp(12px,2.8svh,18px)}.local-doc-bottom h2{font-size:clamp(14px,5.2vw,21px)}.local-passport-card .local-doc-bottom h2{font-size:clamp(15px,5.4vw,22px)}.local-doc-card .local-more{width:34px;height:34px;flex-basis:34px}}
 
       .local-passport-card{cursor:pointer;height:500px;max-height:500px;flex-basis:clamp(314px,89vw,415px)}
-      .local-passport-menu{position:fixed;inset:0;z-index:9999;display:none;font-family:e-UkraineLocal,Arial,sans-serif;color:#050505;letter-spacing:0}
-      .local-passport-menu.is-open{display:block}
-      .local-passport-menu-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(1px)}
-      .local-passport-menu-stack{position:absolute;left:0;right:0;bottom:20;display:flex;flex-direction:column;align-items:center;gap:clamp(9px,2.1vw,12px);padding:0 clamp(16px,4vw,23px);box-sizing:border-box}
+      .local-passport-menu{position:fixed;inset:0;z-index:9999;display:block;opacity:0;pointer-events:none;transition:opacity .2s;font-family:e-UkraineLocal,Arial,sans-serif;color:#050505;letter-spacing:0}
+      .local-passport-menu.is-open{opacity:1;pointer-events:auto}
+      .local-passport-menu-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(1px);opacity:0;transition:opacity .2s}
+      .local-passport-menu.is-open .local-passport-menu-backdrop{opacity:1}
+      .local-passport-menu-stack{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:clamp(9px,2.1vw,12px);padding:0 clamp(16px,4vw,23px) clamp(16px,4vw,23px);box-sizing:border-box;transform:translateY(120%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+      .local-passport-menu.is-open .local-passport-menu-stack{transform:translateY(0)}
       .local-passport-menu-sheet{width:min(100%,530px);background:#fff;border-radius:clamp(22px,5.2vw,30px);overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.18)}
-      .local-passport-menu-row{width:100%;min-height:clamp(56px,14.4vw,82px);display:flex;align-items:center;gap:clamp(18px,4.8vw,28px);border:0;background:#fff;color:#050505;padding:0 clamp(18px,4.2vw,24px) 0 clamp(34px,9vw,52px);font:inherit;font-size:clamp(16px,4vw,22px);line-height:1.18;font-weight:600;text-align:left}
+      .local-passport-menu-row{width:100%;min-height:clamp(56px,14.4vw,82px);display:flex;align-items:center;gap:clamp(18px,4.8vw,28px);border:0;background:#fff;color:#050505;padding:0 clamp(18px,4.2vw,24px) 0 clamp(34px,9vw,52px);font:inherit;font-size:13px;line-height:1.18;font-weight:600;text-align:left}
       .local-passport-menu-row span:last-child{display:block;min-width:0}
       .local-passport-menu-row:nth-child(1),.local-passport-menu-row:nth-child(2){box-shadow:inset 0 -1px #e9e9e9}
       .local-passport-menu-row:nth-child(5){box-shadow:inset 0 -1px #e9e9e9}
-      .local-passport-menu-icon{width:clamp(20px,4.6vw,26px);height:clamp(20px,4.6vw,26px);flex:0 0 clamp(20px,4.6vw,26px);background:#050505;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain}
-      .local-passport-menu-icon-info{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 2.8h8.5L19 6.3V21H7a2 2 0 0 1-2-2V4.8a2 2 0 0 1 2-2Z M15 2.8v4h4 M9 8.5h5 M9 12h6 M9 15.5h6 M9 19h4'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 2.8h8.5L19 6.3V21H7a2 2 0 0 1-2-2V4.8a2 2 0 0 1 2-2Z M15 2.8v4h4 M9 8.5h5 M9 12h6 M9 15.5h6 M9 19h4'/%3E%3C/svg%3E")}
-      .local-passport-menu-icon-home{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M4 4.5h10v10H4z M8 18.5h4 M8 14.5v4 M16.5 12.5l3.5 3v5h-7v-5l3.5-3Z M14.5 16.5h4'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M4 4.5h10v10H4z M8 18.5h4 M8 14.5v4 M16.5 12.5l3.5 3v5h-7v-5l3.5-3Z M14.5 16.5h4'/%3E%3C/svg%3E")}
-      .local-passport-menu-icon-star{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z'/%3E%3C/svg%3E")}
-      .local-passport-menu-icon-sort{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 7h13 M16 3l4 4-4 4 M17 17H4 M8 13l-4 4 4 4'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 7h13 M16 3l4 4-4 4 M17 17H4 M8 13l-4 4 4 4'/%3E%3C/svg%3E")}
-      .local-passport-menu-icon-help{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M9.7 9.3a2.4 2.4 0 0 1 4.6 1.1c0 2-2.5 1.8-2.5 3.6 M12 17h.01'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M9.7 9.3a2.4 2.4 0 0 1 4.6 1.1c0 2-2.5 1.8-2.5 3.6 M12 17h.01'/%3E%3C/svg%3E")}
+      .local-passport-menu-icon{width:clamp(20px,4.6vw,26px);height:clamp(20px,4.6vw,26px);flex:0 0 clamp(20px,4.6vw,26px);background-position:center;background-repeat:no-repeat;background-size:contain}
+      .local-passport-menu-icon-info{background-image:url("../img/nav/docs.svg")}
+      .local-passport-menu-icon-home{background-image:url("../img/vaucher2.svg");background-size:160%}
+      .local-passport-menu-icon-star{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z'/%3E%3C/svg%3E")}
+      .local-passport-menu-icon-sort{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 7h13 M16 3l4 4-4 4 M17 17H4 M8 13l-4 4 4 4'/%3E%3C/svg%3E")}
+      .local-passport-menu-icon-help{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M9.7 9.3a2.4 2.4 0 0 1 4.6 1.1c0 2-2.5 1.8-2.5 3.6 M12 17h.01'/%3E%3C/svg%3E")}
       .local-passport-menu-actions{height:clamp(122px,31vw,178px);display:flex;align-items:center;justify-content:space-around;padding:clamp(12px,3.1vw,18px) clamp(20px,7.6vw,44px) clamp(16px,3.8vw,22px);box-sizing:border-box}
       .local-passport-menu-action{display:flex;flex-direction:column;align-items:center;gap:clamp(12px,3.1vw,18px);border:0;background:transparent;color:#050505;font:inherit;font-size:clamp(16px,4vw,22px);line-height:1;font-weight:500;min-width:clamp(105px,22vw,128px)}
       .local-passport-menu-action-icon{width:clamp(54px,13vw,75px);height:clamp(54px,13vw,75px);border-radius:50%;background:#000;display:grid;place-items:center;color:#fff}
       .local-passport-menu-action-icon:before{content:"";display:block;width:clamp(25px,5.9vw,34px);height:clamp(25px,5.9vw,34px);background:currentColor;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain}
-      .local-passport-menu-action-qr:before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm9-2h2v2h-2v-2zm3 0h2v2h-2v-2zm2 2h2v2h-2v-2zm-5 1h2v2h-2v-2zm3 2h2v2h-2v-2zm-3 2h2v2h-2v-2zm7 0h2v2h-2v-2z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm9-2h2v2h-2v-2zm3 0h2v2h-2v-2zm2 2h2v2h-2v-2zm-5 1h2v2h-2v-2zm3 2h2v2h-2v-2zm-3 2h2v2h-2v-2zm7 0h2v2h-2v-2z'/%3E%3C/svg%3E")}
+      .local-passport-menu-action-qr:before{-webkit-mask-image:url("../img/icons/qrActive.svg");mask-image:url("../img/icons/qrActive.svg")}
       .local-passport-menu-action-bar:before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 5h2v14H3V5zm4 0h1.4v14H7V5zm3.5 0h2.3v14h-2.3V5zm4.2 0h1.2v14h-1.2V5zm3.1 0H20v14h-2.2V5z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 5h2v14H3V5zm4 0h1.4v14H7V5zm3.5 0h2.3v14h-2.3V5zm4.2 0h1.2v14h-1.2V5zm3.1 0H20v14h-2.2V5z'/%3E%3C/svg%3E")}
       .local-passport-menu-close{width:min(100%,530px);min-height:clamp(54px,12.7vw,73px);border:0;border-radius:999px;background:#fff;color:#050505;font:inherit;font-size:clamp(19px,4.2vw,24px);line-height:1;font-weight:500;box-shadow:0 8px 18px rgba(0,0,0,.14)}
       .local-qr-time{font-size:clamp(12px,3.5vw,14px);color:rgba(0,0,0,.55);text-align:center;margin-top:clamp(6px,2.0svh,16px)}
       .local-qr-panel{flex:1;display:flex;align-items:center;justify-content:center}
       .local-qr-image{width:clamp(220px,70vw,290px);aspect-ratio:1/1;border-radius:0;background:transparent url("https://i.imgur.com/9aRH1Vs.png") center/contain no-repeat;box-shadow:none}
+      .local-qr-image--barcode{aspect-ratio:auto;background:none!important}
       .local-qr-switch{display:flex;justify-content:space-evenly;gap:clamp(14px,4.2vw,24px);padding-bottom:clamp(6px,1.8svh,14px)}
       .local-qr-tab{background:transparent;border:0;font:inherit;color:#000;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:120px}
       .local-qr-tab span:last-child{font-size:clamp(14px,4vw,16px);font-weight:500}
