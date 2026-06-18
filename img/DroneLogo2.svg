@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <ns0:rect x="122" y="112" width="780" height="780" rx="217.6" fill="none" stroke="#fff" stroke-width="24" />
+
+  <ns0:path fill="#fff" d="     M286 322     Q396 322 396 472     L390 624     L452 624     L452 334     Q452 280 512 220     Q572 280 572 334     L572 624     L632 624     L626 472     Q626 322 736 322     L736 704     L572 704     L512 796     L452 704     L286 704     Z" />
+</ns0:svg>

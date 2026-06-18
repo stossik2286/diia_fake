@@ -1,8 +1,8 @@
-﻿<html class="android" lang="">
+<html class="android" lang="">
   <head>
     <meta charset="utf-8" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-    <meta content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" name="viewport" />
+    <meta content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=overlays-content" name="viewport" />
     <meta content="yes" name="apple-mobile-web-app-capable" />
     <meta content="yes" name="mobile-web-app-capable" />
     <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
@@ -124,6 +124,11 @@
                 document.querySelectorAll(".local-photo"),
                 function (el) {
                   el.style.backgroundImage = photoUrl;
+                  el.style.backgroundSize = "cover";
+                  el.style.backgroundPosition = "center top";
+                  el.style.backgroundRepeat = "no-repeat";
+                  el.style.backgroundColor = "transparent";
+                  el.style.borderColor = "transparent";
                 }
               );
             }
@@ -277,88 +282,119 @@
           return nav;
         }
 
+        var DOC_ORDER_DEFAULT = ["passport", "edocument", "tax"];
+        var DOC_LABELS = {
+          passport: "Паспорт громадянина України",
+          edocument: "єДокумент",
+          tax: "Картка платника податків"
+        };
+
+        function getDocOrder() {
+          try {
+            var stored = JSON.parse(localStorage.getItem("local_doc_order"));
+            if (Array.isArray(stored) && stored.length === DOC_ORDER_DEFAULT.length) return stored;
+          } catch (e) {}
+          return DOC_ORDER_DEFAULT.slice();
+        }
+
+        function saveDocOrder(order) {
+          localStorage.setItem("local_doc_order", JSON.stringify(order));
+        }
+
+        function docCardHtml(key) {
+          var pName = localProfileName.replace(/ /g, "<br>");
+          if (key === "tax") {
+            return '<section class="local-doc-card local-tax-card">' +
+              '<div class="local-doc-title">Картка платника податків</div>' +
+              '<div class="local-tax-label">РНОКПП</div>' +
+              '<div class="local-tax-fio">' + pName + '</div>' +
+              '<div class="local-tax-data">Дата народження:<br>20.09.2007</div>' +
+              '<div class="local-tax-space"></div>' +
+              '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; </span></div>' +
+              '<div class="local-doc-bottom">' +
+                '<h2 style="display:flex;align-items:center;gap:6px">4044006296 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 13.5L13 13.5C13.2761 13.5 13.5 13.2761 13.5 13L13.5 6C13.5 5.72386 13.2761 5.5 13 5.5L6 5.5C5.72386 5.5 5.5 5.72386 5.5 6L5.5 13C5.5 13.2761 5.72386 13.5 6 13.5ZM13 15C14.1046 15 15 14.1046 15 13L15 6C15 4.89543 14.1046 4 13 4L6 4C4.89543 4 4 4.89543 4 6L4 13C4 14.1046 4.89543 15 6 15L13 15Z" fill="black"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5L11 18.5C10.7239 18.5 10.5 18.2761 10.5 18V16H9V18C9 19.1046 9.89543 20 11 20H18C19.1046 20 20 19.1046 20 18V11C20 9.89543 19.1046 9 18 9H16V10.5H18C18.2761 10.5 18.5 10.7239 18.5 11L18.5 18C18.5 18.2761 18.2761 18.5 18 18.5Z" fill="black"/></svg></h2>' +
+                '<button class="local-more" type="button" aria-label="Більше">...</button>' +
+              '</div>' +
+            '</section>';
+          }
+          if (key === "passport") {
+            return '<section class="local-doc-card local-passport-card">' +
+              '<div class="local-card-inner">' +
+                '<div class="local-card-face local-card-front">' +
+                  '<div class="local-doc-title">Паспорт громадянина України</div>' +
+                  '<div class="local-doc-mid">' +
+                    '<div class="local-photo"></div>' +
+                    '<div class="local-doc-info">' +
+                      '<p>Дата<br>народження:<br>20.09.2007</p>' +
+                      '<p>Номер:<br>011310794</p>' +
+                      '<div class="local-sign"></div>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b> &bull; </span></div>' +
+                  '<div class="local-doc-bottom">' +
+                    '<h2 class="local-profile-name-el">' + pName + '</h2>' +
+                    '<button class="local-more" type="button" aria-label="Більше">...</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="local-card-face local-card-back" aria-hidden="true">' +
+                  '<div class="local-qr-time">Код діятиме ще <span data-local-qr-ttl>2:59</span> хв</div>' +
+                  '<div class="local-qr-panel">' +
+                    '<div class="local-qr-image" role="img" aria-label="QR code"></div>' +
+                  '</div>' +
+                  '<div class="local-qr-switch">' +
+                    '<button class="local-qr-tab is-active" type="button" data-local-qr-tab="qr">' +
+                      '<span class="local-qr-icon local-qr-icon-qr" aria-hidden="true"></span>' +
+                      '<span>QR-код</span>' +
+                    '</button>' +
+                    '<button class="local-qr-tab" type="button" data-local-qr-tab="barcode">' +
+                      '<span class="local-qr-icon local-qr-icon-bar" aria-hidden="true"></span>' +
+                      '<span>Штрихкод</span>' +
+                    '</button>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</section>';
+          }
+          if (key === "edocument") {
+            return '<section class="local-doc-card local-passport-card local-edocument-card">' +
+              '<div class="local-card-inner">' +
+                '<div class="local-card-face local-card-front">' +
+                  '<div class="local-doc-title">єДокумент</div>' +
+                  '<div class="local-doc-mid">' +
+                    '<div class="local-photo"></div>' +
+                    '<div class="local-doc-info">' +
+                      '<p>Дата<br>народження:<br>20.09.2007</p>' +
+                      '<p>РНОКПП:<br>4044006296</p>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="local-marquee"><span>Документ діє під час воєнного стану. Ой у лузі червона калина похилилася, чогось наша славна Україна зажурилася. А ми тую червону калину підіймемо, а ми нашу славну Україну, гей, гей, розвеселимо! &bull; Документ діє під час воєнного стану. Ой у лузі червона калина похилилася, чогось наша славна Україна зажурилася. А ми тую червону калину підіймемо, а ми нашу славну Україну, гей, гей, розвеселимо! &bull; </span></div>' +
+                  '<div class="local-doc-bottom">' +
+                    '<h2 class="local-profile-name-el">' + pName + '</h2>' +
+                    '<button class="local-more" type="button" aria-label="Більше">...</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="local-card-face local-card-back" aria-hidden="true">' +
+                  '<div class="local-qr-panel">' +
+                    '<div class="local-qr-image" role="img" aria-label="QR code"></div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</section>';
+          }
+          return '';
+        }
+
         function renderDocsFallback(root) {
           root.dataset.mode = "docs";
+          var order = getDocOrder();
+          var cardsHtml = '';
+          for (var i = 0; i < order.length; i++) {
+            cardsHtml += docCardHtml(order[i]);
+          }
           root.innerHTML =
             '<div class="local-doc-stage">' +
               '<div class="local-docs" aria-label="Документи">' +
-                '<section class="local-doc-card local-tax-card">' +
-                  '<div class="local-doc-title">Картка платника податків</div>' +
-                  '<div class="local-tax-label">РНОКПП</div>' +
-'<div class="local-tax-fio">' + localProfileName.replace(/ /g, "<br>") + '</div>' +
-'<div class="local-tax-data">Дата народження:<br>20.09.2007</div>' +
-                  '<div class="local-tax-space"></div>' +
-                  '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; </span></div>' +
-                  '<div class="local-doc-bottom">' +
-                    '<h2 style="display:flex;align-items:center;gap:6px">4044006296 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 13.5L13 13.5C13.2761 13.5 13.5 13.2761 13.5 13L13.5 6C13.5 5.72386 13.2761 5.5 13 5.5L6 5.5C5.72386 5.5 5.5 5.72386 5.5 6L5.5 13C5.5 13.2761 5.72386 13.5 6 13.5ZM13 15C14.1046 15 15 14.1046 15 13L15 6C15 4.89543 14.1046 4 13 4L6 4C4.89543 4 4 4.89543 4 6L4 13C4 14.1046 4.89543 15 6 15L13 15Z" fill="black"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18 18.5L11 18.5C10.7239 18.5 10.5 18.2761 10.5 18V16H9V18C9 19.1046 9.89543 20 11 20H18C19.1046 20 20 19.1046 20 18V11C20 9.89543 19.1046 9 18 9H16V10.5H18C18.2761 10.5 18.5 10.7239 18.5 11L18.5 18C18.5 18.2761 18.2761 18.5 18 18.5Z" fill="black"/></svg></h2>' +
-                    '<button class="local-more" type="button" aria-label="Більше">...</button>' +
-                  '</div>' +
-                '</section>' +
-                '<section class="local-doc-card local-service-card">' +
-                  '<div class="local-doc-title">Військовий документ</div>' +
-                  '<p>Дані доступні в локальному режимі.</p>' +
-                  '<div class="local-doc-bottom"><h2>Резерв+</h2><button class="local-more" type="button" aria-label="Більше">...</button></div>' +
-                '</section>' +
-                '<section class="local-doc-card local-passport-card">' +
-                  '<div class="local-card-inner">' +
-                    '<div class="local-card-face local-card-front">' +
-                      '<div class="local-doc-title">Паспорт громадянина України</div>' +
-                      '<div class="local-doc-mid">' +
-                        '<div class="local-photo"></div>' +
-                        '<div class="local-doc-info">' +
-                          '<p>Дата<br>народження:<br>20.09.2007</p>' +
-                          '<p>Номер:<br>011310794</p>' +
-                          '<div class="local-sign"></div>' +
-                        '</div>' +
-                      '</div>' +
-                      '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b></span></div>' +
-                      '<div class="local-doc-bottom">' +
-                        '<h2 class="local-profile-name-el">' + localProfileName.replace(/ /g, "<br>") + '</h2>' +
-                        '<button class="local-more" type="button" aria-label="Більше">...</button>' +
-                      '</div>' +
-                    '</div>' +
-                    '<div class="local-card-face local-card-back" aria-hidden="true">' +
-                      '<div class="local-qr-time">Код діятиме ще <span data-local-qr-ttl>2:59</span> хв</div>' +
-                      '<div class="local-qr-panel">' +
-                        '<div class="local-qr-image" role="img" aria-label="QR code"></div>' +
-                      '</div>' +
-                      '<div class="local-qr-switch">' +
-                        '<button class="local-qr-tab is-active" type="button" data-local-qr-tab="qr">' +
-                          '<span class="local-qr-icon local-qr-icon-qr" aria-hidden="true"></span>' +
-                          '<span>QR-код</span>' +
-                        '</button>' +
-                        '<button class="local-qr-tab" type="button" data-local-qr-tab="barcode">' +
-                          '<span class="local-qr-icon local-qr-icon-bar" aria-hidden="true"></span>' +
-                          '<span>Штрихкод</span>' +
-                        '</button>' +
-                      '</div>' +
-                    '</div>' +
-                  '</div>' +
-                '</section>' +
-                '<section class="local-doc-card local-passport-card">' +
-                  '<div class="local-card-inner">' +
-                    '<div class="local-card-face local-card-front">' +
-                      '<div class="local-doc-title">єДокумент</div>' +
-                      '<div class="local-doc-mid">' +
-                        '<div class="local-photo"></div>' +
-                        '<div class="local-doc-info">' +
-                          '<p>Дата<br>народження:<br>20.09.2007</p>' +
-                          '<p>РНОКПП:<br>4044006296</p>' +
-                        '</div>' +
-                      '</div>' +
-                      '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Документ оновлено о <b data-local-update-time></b></span></div>' +
-                      '<div class="local-doc-bottom">' +
-                        '<h2 class="local-profile-name-el">' + localProfileName.replace(/ /g, "<br>") + '</h2>' +
-                        '<button class="local-more" type="button" aria-label="Більше">...</button>' +
-                      '</div>' +
-                    '</div>' +
-                    '<div class="local-card-face local-card-back" aria-hidden="true">' +
-                      '<div class="local-qr-panel">' +
-                        '<div class="local-qr-image" role="img" aria-label="QR code"></div>' +
-                      '</div>' +
-                    '</div>' +
-                  '</div>' +
-                '</section>' +
+                cardsHtml +
                 '<section class="local-doc-card local-add-card">' +
                   '<div class="local-doc-title">Додати свідоцтво про народження дитини</div>' +
                   '<p>Зараз ви можете додати до документів свідоцтво про народження.</p>' +
@@ -374,15 +410,8 @@
                     '<span>Змінити порядок<br>документів</span>' +
                   '</button>' +
                 '</section>' +
-                '<section class="local-doc-card local-service-card">' +
-                  '<div class="local-doc-title">Посвідчення водія</div>' +
-                  '<p>Документ готовий до перегляду.</p>' +
-                  '<div class="local-doc-bottom"><h2>Водій</h2><button class="local-more" type="button" aria-label="Більше">...</button></div>' +
-                '</section>' +
               '</div>' +
-              '<div class="local-dots" aria-hidden="true">' +
-                '<span></span><span></span><span class="active"></span><span></span><span></span>' +
-              '</div>' +
+              '<div class="local-dots" aria-hidden="true"></div>' +
               '<div class="local-passport-menu" aria-hidden="true">' +
                 '<div class="local-passport-menu-backdrop" data-passport-menu-close></div>' +
                 '<div class="local-passport-menu-stack" role="dialog" aria-modal="true" aria-label="Меню документа">' +
@@ -401,34 +430,21 @@
                 '</div>' +
               '</div>' +
             '</div>';
-          root.querySelectorAll(".local-service-card").forEach(function (card) {
-            card.remove();
-          });
           root.querySelector(".local-dots").innerHTML = Array.prototype.map.call(root.querySelectorAll(".local-doc-card"), function (_, index) {
-            return '<span' + (index === 1 ? ' class="active"' : '') + '></span>';
+            return '<span' + (index === 0 ? ' class="active"' : '') + '></span>';
           }).join("");
           initializeDocFallback(root);
           updateLocalTimes(root);
-          // Apply token-specific photo from localStorage
-          var photoId = localStorage.getItem("auth_photo_id");
-          if (photoId) {
-            var photoUrl = "url('/api/photo/" + photoId + "')";
-            root.querySelectorAll(".local-photo").forEach(function (el) {
-              el.style.backgroundImage = photoUrl;
+
+          var managePanels = root.querySelectorAll(".local-doc-manage-panel");
+          if (managePanels.length >= 2) {
+            managePanels[1].addEventListener("click", function () {
+              history.replaceState(null, "", "/app/docs/sort");
+              renderSortDocsFallback(root);
             });
           }
-        }
 
-        function renderNewsFallback(root) {
-          root.dataset.mode = "news";
-          root.innerHTML =
-            '<div class="local-feed-screen">' +
-              '<h1 class="local-feed-title">Стрічка</h1>' +
-              '<div class="local-feed-list">' +
-                '<article class="local-feed-card"><time datetime="2026-05-10">10.05.2026</time><h2>Документи доступні</h2><p>Локальний режим увімкнено. Дані завантажені без зовнішнього API.</p></article>' +
-                '<article class="local-feed-card"><time datetime="2026-05-10">10.05.2026</time><h2>Оновлення сервісів</h2><p>Сервіси Дії відображаються у демо-режимі.</p></article>' +
-              '</div>' +
-            '</div>';
+          applyPhoto();
         }
 
         function renderNewsFallback(root) {
@@ -438,13 +454,37 @@
               '<h1 class="local-feed-hello">Привіт, <span class="local-profile-name-el">' + (localProfileName.split(" ")[1] || localProfileName) + ' 👋</span></h1>' +
               '<section class="local-feed-resilience"><div><h2>Незламність</h2><p>Мапа укриттів, Пунктів незламності та відділень Power Banking. Заява про відсутній зв’язок.</p><div class="local-feed-mini-icons"><span class="shield"></span><span class="bolt"></span><span class="bank"></span></div></div><button type="button" class="local-feed-arrow local-feed-arrow--black" aria-label="Відкрити"></button></section>' +
               '<div class="local-feed-actions"><button type="button"><span class="local-feed-action-ico scan"></span><span>Дія<br>Сканер</span></button><button type="button"><span class="local-feed-action-ico trident"></span><span>Військові<br>облігації</span></button><button type="button"><span class="local-feed-action-ico tower"></span><span>Відсутній<br>зв’язок</span></button></div>' +
-              '<section class="local-feed-drone"><div class="local-feed-drone-art"><span class="local-feed-drone-logo"></span><strong>ЛІНІЯ<br>ДРОНІВ</strong></div><div class="local-feed-drone-bottom"><span>Змінити хід подій</span><button type="button" class="local-feed-arrow local-feed-arrow--white" aria-label="Відкрити"></button></div></section>' +
+              '<section class="local-feed-drone"><div class="local-feed-drone-art"><span class="local-feed-drone-logo"></span><strong>ЛІНІЯ<br>ДРОНІВ</strong><div class="local-feed-drone-overlay"><span>Змінити хід подій</span><button type="button" class="local-feed-arrow local-feed-arrow--white" aria-label="Відкрити"></button></div></div></section>' +
               '<h2 class="local-feed-section-title">Що нового?</h2>' +
-              '<div class="local-feed-news-row"><article class="local-feed-news-card"><div class="local-feed-piggy"></div><div class="local-feed-news-copy"><time>Сьогодні, 16:05</time><h3>10 банків для бізнесу в е-Підприємці — обирайте свій</h3></div></article><article class="local-feed-news-card local-feed-news-card--peek"><div class="local-feed-piggy"></div><div class="local-feed-news-copy"><time>Сьогодні</time><h3>Нові можливості у застосунку</h3></div></article></div>' +
-              '<div class="local-feed-slider-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span></div>' +
+              '<div class="local-feed-news-row"><article class="local-feed-news-card"><img src="/img/news3.jpg" alt=""><div class="local-feed-news-copy"><time>18 червня, 12:00</time><h3>Шукаємо пари для тестування послуги: розірвання шлюбу онлайн</h3></div></article><article class="local-feed-news-card"><img src="/img/news1.jpg" alt=""><div class="local-feed-news-copy"><time>16 червня, 16:45</time><h3>+1 послуга для Захисників: оформлюйте легко в Дії</h3></div></article><article class="local-feed-news-card"><img src="/img/news2.jpg" alt=""><div class="local-feed-news-copy"><time>16 червня, 10:10</time><h3>Голосуйте за поштову марку до Дня Незалежності</h3></div></article></div>' +
+              '<div class="local-feed-slider-dots"><span class="active"></span><span></span><span></span></div>' +
               '<h2 class="local-feed-section-title">Популярні послуги</h2>' +
               '<div class="local-feed-services"><button type="button"><span>Опитування</span><i></i></button><button type="button"><span>Заміна водійського посвідчення</span><i></i></button><button type="button"><span>Податки ФОП</span><i></i></button></div>' +
             '</div>';
+
+          var newsRow = root.querySelector(".local-feed-news-row");
+          var newsDots = root.querySelectorAll(".local-feed-slider-dots span");
+          if (newsRow && newsDots.length) {
+            newsRow.addEventListener("scroll", function () {
+              var card = newsRow.querySelector(".local-feed-news-card");
+              if (!card) return;
+              var cardW = card.offsetWidth + 16;
+              var idx = Math.round(newsRow.scrollLeft / cardW);
+              for (var d = 0; d < newsDots.length; d++) {
+                newsDots[d].classList.toggle("active", d === idx);
+              }
+            });
+            for (var n = 0; n < newsDots.length; n++) {
+              (function (i) {
+                newsDots[i].addEventListener("click", function () {
+                  var card = newsRow.querySelector(".local-feed-news-card");
+                  if (!card) return;
+                  var cardW = card.offsetWidth + 16;
+                  newsRow.scrollTo({ left: i * cardW, behavior: "smooth" });
+                });
+              })(n);
+            }
+          }
         }
 
         function renderAiFallback(root) {
@@ -482,9 +522,85 @@
               '</main>' +
               '<div class="local-ai-inputbar">' +
                 '<button class="local-ai-spark-btn" type="button" aria-label="Дія.AI"></button>' +
-                '<div class="local-ai-input">Чим можу допомогти?</div>' +
+                '<input class="local-ai-input" type="text" placeholder="Чим можу допомогти?">' +
+              '</div>' +
+              '<div class="local-ai-sheet-overlay">' +
+                '<div class="local-ai-sheet-stack">' +
+                  '<div class="local-ai-sheet">' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Допоможи розібратися</div>' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Навчи інвестувати в облігації через Дію</div>' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Розкажи про Дія.Картку</div>' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Поясни простими словами</div>' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Як змінити місце проживання?</div>' +
+                    '<div class="local-ai-sheet-item"><span class="local-ai-sheet-icon"></span>Хто створює сервіси Дії?</div>' +
+                  '</div>' +
+                  '<button class="local-ai-sheet-close" type="button">Закрити</button>' +
+                '</div>' +
               '</div>' +
             '</div>';
+
+          var overlay = root.querySelector(".local-ai-sheet-overlay");
+          var sparkBtn = root.querySelector(".local-ai-spark-btn");
+          var closeBtn = root.querySelector(".local-ai-sheet-close");
+          var items = root.querySelectorAll(".local-ai-sheet-item");
+          var input = root.querySelector(".local-ai-input");
+
+          if (overlay) {
+            var oldOverlays = document.body.querySelectorAll(".local-ai-sheet-overlay");
+            for (var k = 0; k < oldOverlays.length; k++) {
+              if (oldOverlays[k] !== overlay) oldOverlays[k].parentNode.removeChild(oldOverlays[k]);
+            }
+            document.body.appendChild(overlay);
+          }
+
+          if (sparkBtn && overlay) {
+            sparkBtn.addEventListener("click", function () {
+              overlay.classList.add("is-open");
+            });
+          }
+          if (closeBtn && overlay) {
+            closeBtn.addEventListener("click", function () {
+              overlay.classList.remove("is-open");
+            });
+          }
+          if (overlay) {
+            overlay.addEventListener("click", function (e) {
+              if (e.target === overlay) overlay.classList.remove("is-open");
+            });
+          }
+          for (var i = 0; i < items.length; i++) {
+            (function (item) {
+              item.addEventListener("click", function () {
+                if (input) input.value = item.textContent;
+                overlay.classList.remove("is-open");
+              });
+            })(items[i]);
+          }
+
+          var inputbar = root.querySelector(".local-ai-inputbar");
+          if (inputbar) {
+            var oldBars = document.body.querySelectorAll(".local-ai-inputbar");
+            for (var b = 0; b < oldBars.length; b++) {
+              if (oldBars[b] !== inputbar) oldBars[b].parentNode.removeChild(oldBars[b]);
+            }
+            document.body.appendChild(inputbar);
+          }
+
+          if (!window.__localKeyboardInstalled) {
+            window.__localKeyboardInstalled = true;
+            window.repositionKeyboard = function () {
+              var bar = document.body.querySelector(".local-ai-inputbar");
+              if (!bar) return;
+              if (window.visualViewport) {
+                var diff = window.innerHeight - window.visualViewport.height;
+                bar.style.bottom = (diff > 80 ? diff : 0) + "px";
+              }
+            };
+            if (window.visualViewport) {
+              window.visualViewport.addEventListener("resize", window.repositionKeyboard);
+            }
+          }
+          window.repositionKeyboard();
         }
 
         function renderServicesFallback(root) {
@@ -528,7 +644,7 @@
               '<div class="local-svc-grid" role="list">' +
                 tiles.map(function (t) {
                   return (
-                    '<button type="button" class="local-svc-cell" role="listitem">' +
+                    '<button type="button" class="local-svc-cell" role="listitem" data-svc="' + t[1] + '">' +
                       '<span class="local-svc-ico local-svc-ico--' + t[1] + '" aria-hidden="true"></span>' +
                       '<span class="local-svc-lbl">' + t[0] + '</span>' +
                     '</button>'
@@ -536,6 +652,95 @@
                 }).join("") +
               '</div>' +
             '</div>';
+
+          root.querySelectorAll(".local-svc-cell").forEach(function (cell) {
+            cell.addEventListener("click", function () {
+              var svc = cell.getAttribute("data-svc");
+              if (svc === "army") {
+                history.pushState(null, "", "/app/services/army");
+                renderArmyAidFallback(root);
+              }
+            });
+          });
+        }
+
+        function renderArmyAidFallback(root) {
+          root.dataset.mode = "army-aid";
+          root.innerHTML =
+            '<div class="local-army-screen">' +
+              '<header class="local-army-head">' +
+                '<button type="button" class="local-army-back" aria-label="Назад"></button>' +
+                '<div class="local-army-head-text">' +
+                  '<h1 class="local-army-title">Допомога армії</h1>' +
+                '</div>' +
+              '</header>' +
+              '<div class="local-army-scroll">' +
+                '<div class="local-army-hero">' +
+                  '<img class="local-army-drone-img" src="/img/drone.png" alt="Drone">' +
+                  '<span class="local-army-hero-title">ARMY OF DRONES</span>' +
+                '</div>' +
+                '<p class="local-army-desc">Щоб посилити українську армію та зберегти життя тисяч військових, Генштаб ЗСУ, Міністерство цифрової трансформації та UNITED24 розпочинають проект «Армія дронів»! <br> <a class="local-army-desc-link" href="https://u24.gov.ua" target="_blank">Детальніше на сайті UNITED24</a></p>' +
+                '<div class="local-army-input-card">' +
+                  '<label class="local-army-label">Вкажіть суму внеску, грн</label>' +
+                  '<input class="local-army-input" type="number" inputmode="numeric" placeholder="Сума">' +
+                '</div>' +
+                '<p class="local-army-hint">Або виберіть розмір внеску з варіантів нижче:</p>' +
+                '<div class="local-army-amounts">' +
+                  '<button type="button" class="local-army-amt" data-amount="100">100 грн</button>' +
+                  '<button type="button" class="local-army-amt" data-amount="500">500 грн</button>' +
+                  '<button type="button" class="local-army-amt" data-amount="1000">1000 грн</button>' +
+                  '<button type="button" class="local-army-amt" data-amount="5000">5000 грн</button>' +
+                '</div>' +
+                '<div class="local-army-collected">' +
+                  '<div class="local-army-collected-head"><strong>Вже зібрано</strong><span>748 535 133 грн</span></div>' +
+                  '<div class="local-army-fund">' +
+                    '<h3>Армія дронів</h3>' +
+                    '<div class="local-army-fund-stats"><span class="local-army-stat"><span class="local-army-flag"></span>318 091 195 грн</span><span class="local-army-stat"><span class="local-army-people"></span>320 610</span></div>' +
+                    '<a class="local-army-fund-link" href="#">Що вже було придбано<span class="local-army-arrow"></span></a>' +
+                  '</div>' +
+                  '<div class="local-army-fund">' +
+                    '<h3>UNITED24</h3>' +
+                    '<div class="local-army-fund-stats"><span class="local-army-stat"><span class="local-army-flag"></span>111 997 055 грн</span><span class="local-army-stat"><span class="local-army-people"></span>130 190</span></div>' +
+                    '<a class="local-army-fund-link" href="#">Що вже було придбано<span class="local-army-arrow"></span></a>' +
+                  '</div>' +
+                  '<div class="local-army-fund">' +
+                    '<h3>Фонд «Повернись живим»</h3>' +
+                    '<div class="local-army-fund-stats"><span class="local-army-stat"><span class="local-army-flag"></span>318 446 883 грн</span><span class="local-army-stat"><span class="local-army-people"></span>296 425</span></div>' +
+                    '<a class="local-army-fund-link" href="#">Що вже було придбано<span class="local-army-arrow"></span></a>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="local-army-bottom">' +
+                '<button type="button" class="local-army-pay" disabled>Перейти до оплати</button>' +
+              '</div>' +
+            '</div>';
+
+          var backBtn = root.querySelector(".local-army-back");
+          if (backBtn) {
+            backBtn.addEventListener("click", function () {
+              history.back();
+            });
+          }
+
+          var armyInput = root.querySelector(".local-army-input");
+          var payBtn = root.querySelector(".local-army-pay");
+          var amtBtns = root.querySelectorAll(".local-army-amt");
+
+          function syncPay() {
+            var val = armyInput && armyInput.value ? parseInt(armyInput.value, 10) : 0;
+            if (payBtn) payBtn.disabled = val <= 0;
+          }
+
+          if (armyInput) armyInput.addEventListener("input", syncPay);
+
+          for (var a = 0; a < amtBtns.length; a++) {
+            (function (btn) {
+              btn.addEventListener("click", function () {
+                if (armyInput) armyInput.value = btn.getAttribute("data-amount");
+                syncPay();
+              });
+            })(amtBtns[a]);
+          }
         }
 
         function renderMenuFallback(root) {
@@ -648,6 +853,188 @@
               });
             });
           }
+        }
+
+        function renderSortDocsFallback(root) {
+          root.dataset.mode = "sort-docs";
+          var nav = document.getElementById("localFallbackNav");
+          if (nav) {
+            nav.style.display = "none";
+          }
+
+          var order = getDocOrder();
+          var itemsHtml = '';
+          for (var i = 0; i < order.length; i++) {
+            itemsHtml += '<div class="local-sort-item" draggable="true" data-sort-key="' + order[i] + '">' +
+              '<span class="local-sort-item-name">' + DOC_LABELS[order[i]] + '</span>' +
+              '<span class="local-sort-item-handle" aria-hidden="true"></span>' +
+            '</div>';
+        }
+
+          root.innerHTML =
+            '<div class="local-sort-screen">' +
+              '<header class="local-sort-head">' +
+                '<button class="local-sort-back" type="button" aria-label="Назад"></button>' +
+              '</header>' +
+              '<h1 class="local-sort-title">Змінити порядок</h1>' +
+              '<div class="local-sort-list">' +
+                itemsHtml +
+              '</div>' +
+            '</div>';
+
+          var backButton = root.querySelector(".local-sort-back");
+          if (backButton) {
+            backButton.addEventListener("click", function () {
+              history.replaceState(null, "", "/app/docs");
+              renderDocsFallback(root);
+              var fallbackNav = makeFallbackNav();
+              fallbackNav.style.display = "grid";
+              Array.prototype.forEach.call(fallbackNav.querySelectorAll("button"), function (item) {
+                var active = item.getAttribute("data-local-tab") === "docs";
+                item.classList.toggle("active", active);
+                item.classList.toggle("router-link-exact-active", active);
+              });
+            });
+          }
+
+          setupSortDragAndDrop(root);
+        }
+
+        function persistDocOrder(list) {
+          var items = Array.prototype.slice.call(list.querySelectorAll(".local-sort-item"));
+          var newOrder = items.map(function (el) { return el.getAttribute("data-sort-key"); });
+          saveDocOrder(newOrder);
+        }
+
+        function setupSortDragAndDrop(root) {
+          var list = root.querySelector(".local-sort-list");
+          if (!list) return;
+          var items = Array.prototype.slice.call(list.querySelectorAll(".local-sort-item"));
+          var dragItem = null;
+
+          items.forEach(function (item) {
+            item.addEventListener("dragstart", function (e) {
+              dragItem = item;
+              item.classList.add("is-dragging");
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", "");
+            });
+
+            item.addEventListener("dragend", function () {
+              item.classList.remove("is-dragging");
+              dragItem = null;
+              Array.prototype.forEach.call(list.querySelectorAll(".local-sort-item"), function (el) {
+                el.classList.remove("is-above", "is-below");
+              });
+            });
+
+            item.addEventListener("dragover", function (e) {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              if (dragItem === item) return;
+              var rect = item.getBoundingClientRect();
+              var midY = rect.top + rect.height / 2;
+              Array.prototype.forEach.call(list.querySelectorAll(".local-sort-item"), function (el) {
+                el.classList.remove("is-above", "is-below");
+              });
+              if (e.clientY < midY) {
+                item.classList.add("is-above");
+              } else {
+                item.classList.add("is-below");
+              }
+            });
+
+            item.addEventListener("dragleave", function () {
+              item.classList.remove("is-above", "is-below");
+            });
+
+            item.addEventListener("drop", function (e) {
+              e.preventDefault();
+              if (!dragItem || dragItem === item) return;
+              var rect = item.getBoundingClientRect();
+              var midY = rect.top + rect.height / 2;
+              if (e.clientY < midY) {
+                list.insertBefore(dragItem, item);
+              } else {
+                list.insertBefore(dragItem, item.nextSibling);
+              }
+              Array.prototype.forEach.call(list.querySelectorAll(".local-sort-item"), function (el) {
+                el.classList.remove("is-above", "is-below");
+              });
+              persistDocOrder(list);
+            });
+          });
+
+          var touchItem = null;
+          var touchClone = null;
+          var touchStartY = 0;
+
+          items.forEach(function (item) {
+            item.addEventListener("touchstart", function (e) {
+              if (e.touches.length > 1) return;
+              touchItem = item;
+              touchStartY = e.touches[0].clientY;
+              touchClone = item.cloneNode(true);
+              touchClone.classList.add("local-sort-touch-clone");
+              touchClone.style.position = "fixed";
+              touchClone.style.left = item.getBoundingClientRect().left + "px";
+              touchClone.style.top = item.getBoundingClientRect().top + "px";
+              touchClone.style.width = item.getBoundingClientRect().width + "px";
+              touchClone.style.zIndex = "10000";
+              touchClone.style.pointerEvents = "none";
+              touchClone.style.opacity = "0.85";
+              touchClone.style.transition = "none";
+              document.body.appendChild(touchClone);
+              item.classList.add("is-dragging");
+            }, { passive: true });
+
+            item.addEventListener("touchmove", function (e) {
+              if (!touchItem || !touchClone) return;
+              e.preventDefault();
+              var touch = e.touches[0];
+              var deltaY = touch.clientY - touchStartY;
+              touchClone.style.top = (item.getBoundingClientRect().top + deltaY) + "px";
+
+              var allItems = Array.prototype.slice.call(list.querySelectorAll(".local-sort-item"));
+              allItems.forEach(function (el) {
+                el.classList.remove("is-above", "is-below");
+              });
+
+              for (var i = 0; i < allItems.length; i++) {
+                if (allItems[i] === touchItem) continue;
+                var rect = allItems[i].getBoundingClientRect();
+                var midY = rect.top + rect.height / 2;
+                if (touch.clientY < midY) {
+                  allItems[i].classList.add("is-above");
+                  break;
+                } else if (i === allItems.length - 1) {
+                  allItems[i].classList.add("is-below");
+                }
+              }
+            }, { passive: false });
+
+            item.addEventListener("touchend", function () {
+              if (!touchItem || !touchClone) return;
+              var targetEl = list.querySelector(".local-sort-item.is-above") || list.querySelector(".local-sort-item.is-below");
+              if (targetEl) {
+                if (targetEl.classList.contains("is-above")) {
+                  list.insertBefore(touchItem, targetEl);
+                } else {
+                  list.insertBefore(touchItem, targetEl.nextSibling);
+                }
+              }
+              var allItems = Array.prototype.slice.call(list.querySelectorAll(".local-sort-item"));
+              allItems.forEach(function (el) {
+                el.classList.remove("is-dragging", "is-above", "is-below");
+              });
+              if (touchClone && touchClone.parentNode) {
+                touchClone.parentNode.removeChild(touchClone);
+              }
+              touchClone = null;
+              touchItem = null;
+              persistDocOrder(list);
+            });
+          });
         }
 
         function isNewsFeedPath(path) {
@@ -776,6 +1163,14 @@
             return;
           }
 
+          if (path.indexOf("services/army") !== -1) {
+            nav.style.display = "none";
+            if (root.dataset.mode !== "army-aid") {
+              renderArmyAidFallback(root);
+            }
+            return;
+          }
+
           if (path.indexOf("services") !== -1 || path.indexOf("service") !== -1) {
             Array.prototype.forEach.call(nav.querySelectorAll("button"), function (item) {
               var active = item.getAttribute("data-local-tab") === "services";
@@ -809,6 +1204,14 @@
             return;
           }
 
+          if (path.indexOf("docs/sort") !== -1 || path.indexOf("sort-docs") !== -1) {
+            nav.style.display = "none";
+            if (root.dataset.mode !== "sort-docs") {
+              renderSortDocsFallback(root);
+            }
+            return;
+          }
+
           if (path.indexOf("menu") !== -1) {
             Array.prototype.forEach.call(nav.querySelectorAll("button"), function (item) {
               var active = item.getAttribute("data-local-tab") === "menu";
@@ -837,7 +1240,7 @@
           var dots = Array.prototype.slice.call(root.querySelectorAll(".local-dots span"));
           if (!slider || !slides.length || !dots.length) return;
 
-          var activeIndex = Math.min(1, slides.length - 1);
+          var activeIndex = 0;
           var dragging = false;
           var pointerId = null;
           var startX = 0;
@@ -968,9 +1371,14 @@
         }
 
         function setupPassportMenu(root) {
-          var passportCard = root.querySelector(".local-passport-card");
           var menu = root.querySelector(".local-passport-menu");
-          if (!passportCard || !menu || menu.__bound) return;
+          if (!menu || menu.__bound) return;
+
+          var oldMenus = document.body.querySelectorAll(".local-passport-menu");
+          for (var i = 0; i < oldMenus.length; i++) {
+            if (oldMenus[i] !== menu) oldMenus[i].parentNode.removeChild(oldMenus[i]);
+          }
+
           menu.__bound = true;
           document.body.appendChild(menu);
 
@@ -984,21 +1392,38 @@
             menu.setAttribute("aria-hidden", "true");
           }
 
-          var more = passportCard.querySelector(".local-card-front .local-more");
-          if (more) {
-            more.addEventListener("click", function (event) {
-              event.preventDefault();
-              event.stopPropagation();
-              var slider = root.querySelector(".local-docs");
-              if (slider && slider.classList.contains("is-dragging")) return;
-              openMenu();
-            });
+          var moreButtons = root.querySelectorAll(".local-passport-card:not(.local-edocument-card) .local-card-front .local-more");
+          for (var j = 0; j < moreButtons.length; j++) {
+            (function (more) {
+              more.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var slider = root.querySelector(".local-docs");
+                if (slider && slider.classList.contains("is-dragging")) return;
+                openMenu();
+              });
+            })(moreButtons[j]);
           }
 
           menu.addEventListener("click", function (event) {
             if (event.target && event.target.closest && event.target.closest("[data-passport-menu-close]")) {
               event.preventDefault();
               closeMenu();
+            }
+            var sortRow = event.target.closest(".local-passport-menu-icon-sort");
+            if (!sortRow) {
+              var row = event.target.closest(".local-passport-menu-row");
+              if (row && row.querySelector(".local-passport-menu-icon-sort")) {
+                sortRow = true;
+              }
+            }
+            if (sortRow) {
+              event.preventDefault();
+              closeMenu();
+              setTimeout(function () {
+                history.replaceState(null, "", "/app/docs/sort");
+                renderSortDocsFallback(root);
+              }, 250);
             }
           });
 
@@ -1315,6 +1740,7 @@
       .local-doc-card>*{position:relative;z-index:1}
       .local-passport-card{background:transparent;backdrop-filter:none;padding:0;overflow:visible;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
       .local-passport-card .local-card-face{padding-bottom:clamp(16px,4.2vw,22px)}
+      .local-edocument-card .local-card-face{padding-bottom:0}
       .local-passport-card:before,.local-passport-card:after{display:none}
       .local-passport-card>*{z-index:auto}
       .local-card-inner{position:absolute;inset:0;border-radius:inherit;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .46s cubic-bezier(.22,.8,.26,1);will-change:transform}
@@ -1329,18 +1755,19 @@
       .local-passport-card.is-flipped .local-card-back{pointer-events:auto}
       .local-doc-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(20px,6.0vw,26px);line-height:1.08;font-weight:500;margin-bottom:clamp(22px,5svh,36px);max-width:92%;letter-spacing:0}
       .local-doc-mid{display:grid;grid-template-columns:minmax(116px,45%) 1fr;gap:clamp(18px,6.2vw,26px);align-items:start}
-      .local-photo{width:100%;aspect-ratio:153/198;border-radius:16px;background:url("/api/photo.php?uuid=demo") center/cover,url("/photo.jpg") center/cover,#d8dde3;border:1px solid rgba(120,148,180,.35);flex:0 0 auto}
+      .local-photo{width:100%;aspect-ratio:153/198;border-radius:16px;background:url("/api/photo.php?uuid=demo") center top/cover,url("/photo.jpg") center top/cover,#d8dde3;border:1px solid rgba(120,148,180,.35);flex:0 0 auto}
       .local-doc-info{font-size:clamp(13px,3.7vw,15px);line-height:1.2;font-weight:400;padding-top:2px}
       .local-doc-info p{margin:0 0 clamp(16px,3.3svh,22px)}
       .local-sign{width:clamp(60px,18vw,72px);height:clamp(48px,14vw,60px);background:url("/api/signature.php?uuid=demo") center/contain no-repeat,url("/sign.png") center/contain no-repeat;mix-blend-mode:multiply;margin-left:clamp(4px,3.7vw,14px);margin-top:-8px}
       .local-marquee{height:clamp(22px,3.6svh,28px);margin:clamp(22px,4.8svh,34px) calc(-1 * clamp(20px,5.8vw,25px)) 0;background:rgba(145,232,180,.82);display:flex;align-items:center;overflow:hidden;white-space:nowrap;font-size:clamp(12px,3.4vw,14px);font-weight:400}
       .local-doc-card:not(.is-active) .local-marquee{opacity:0;visibility:hidden}
       .local-doc-card.is-active .local-marquee{opacity:1;visibility:visible}
-      .local-marquee span{display:inline-block;padding-left:0;animation:localMarquee 11s linear infinite}
+      .local-marquee span{display:inline-block;padding-left:0;animation:localMarquee 20s linear infinite}
       .local-passport-card.is-flipping .local-marquee span{animation-play-state:paused}
+      .local-edocument-card .local-marquee span{animation-duration:34s}
       .local-marquee b{font-weight:390}
-      @keyframes localMarquee{0%{transform:translateX(0)}100%{transform:translateX(-45%)}}
-      .local-doc-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-top:auto;padding-top:clamp(16px,3.6svh,24px)}
+      @keyframes localMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+      .local-doc-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-top:auto;padding-top:clamp(10px,2.2svh,16px)}
       .local-doc-bottom h2{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(16px,5.8vw,23px);line-height:1.06;margin:0;font-weight:400;letter-spacing:0;flex:1;max-width:calc(100% - 58px);min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow-wrap:anywhere;word-break:break-word}
       .local-more{width:48px;height:48px;border-radius:50%;background:#000;color:#fff;border:0;font-size:0;line-height:0;display:flex;align-items:center;justify-content:center;padding:0;flex:0 0 48px}
       .local-more:before{content:"";width:22px;height:6px;background:radial-gradient(circle at 3px 50%,#fff 0 2px,transparent 2.2px),radial-gradient(circle at 11px 50%,#fff 0 2px,transparent 2.2px),radial-gradient(circle at 19px 50%,#fff 0 2px,transparent 2.2px)}
@@ -1364,13 +1791,6 @@
       .local-dots{height:10px;display:flex;justify-content:center;align-items:center;gap:11px}
       .local-dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.62);transition:transform .18s ease,background .18s ease}
       .local-dots span.active{background:#fff}
-      .local-feed-screen{height:100%;overflow:auto;padding:clamp(18px,5vw,28px) clamp(16px,4.5vw,22px) 24px;box-sizing:border-box;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat}
-      .local-feed-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(26px,7vw,34px);font-weight:500;margin:0 0 clamp(16px,4vw,22px);color:#0a0a0a}
-      .local-feed-list{display:grid;gap:14px}
-      .local-feed-card{background:rgba(255,255,255,.92);border-radius:16px;padding:18px 18px 16px;box-shadow:0 6px 22px rgba(15,40,80,.08);color:#101820}
-      .local-feed-card time{display:block;color:#657385;font-size:13px;margin-bottom:8px;font-weight:400}
-      .local-feed-card h2{font-size:20px;line-height:1.2;margin:0 0 8px;font-weight:600;letter-spacing:0}
-      .local-feed-card p{font-size:15px;line-height:1.45;margin:0}
       .local-feed-screen{height:100%;overflow:auto;padding:clamp(58px,8svh,86px) clamp(18px,5.2vw,26px) 26px;box-sizing:border-box;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat;color:#050505}
       .local-feed-hello{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(26px,7.5vw,38px);line-height:1.00;font-weight:210;margin:0 0 clamp(22px,4.5svh,36px);letter-spacing:0}
       .local-feed-hello span{font-family:Arial,sans-serif;font-weight:150}
@@ -1379,55 +1799,94 @@
       .local-feed-resilience p{font-size:12px;font-weight:50}
       .local-feed-mini-icons{display:flex;margin-top:8px}
       .local-feed-mini-icons span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;margin-right:-4px;color:#fff}
-      .local-feed-mini-icons .shield{background:#2b6ae7}
       .local-feed-mini-icons .bolt{background:#ffd21c}
       .local-feed-mini-icons .bank{width:24px;height:24px;background:url("/img/banking.svg") center/contain no-repeat}
       .local-feed-mini-icons .shield{width:24px;height:24px;background:url("/img/shield.svg") center/contain no-repeat}
       .local-feed-mini-icons .bolt:before{content:"";width:12px;height:20px;background:#000;clip-path:polygon(50% 0,12% 48%,43% 48%,28% 100%,88% 36%,56% 36%)}
       .local-feed-arrow{width:28px;height:28px;border:0;border-radius:50%;display:grid;place-items:center;align-self:flex-end;flex:0 0 44px}
-      .local-feed-arrow:before,.local-feed-services i:before{content:"";width:23px;height:18px;) center/contain no-repeat}
       .local-feed-arrow--black{width:30px;height:30px;background:url("/img/arrowR.svg") center/contain no-repeat}
+      .local-feed-arrow--white{width:29px;height:29px;background:url("/img/arrowR.svg") center/contain no-repeat;filter:invert(1)}
       .local-feed-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:clamp(42px,7.2svh,60px)}
       .local-feed-actions button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:12px;font:inherit;font-size:clamp(17px,4.4vw,23px);line-height:1.12;color:#050505;text-align:center}
-      .local-feed-action-ico{width:62px;height:62px;border-radius:18px;background:#000;display:grid;place-items:center;color:#fff}
+      .local-feed-action-ico{width:53px;height:53px;border-radius:18px;background:#000;display:grid;place-items:center;color:#fff}
       .local-feed-action-ico:before{content:"";width:28px;height:28px;background:currentColor}
-      .local-feed-action-ico.scan:before{width:35px;height:35px;background:url("/img/scanner.svg") center/contain no-repeat}
-      .local-feed-action-ico.trident:before{-webkit-mask:url("/img/gerb.png") center/contain no-repeat;mask:url("/img/gerb.png") center/contain no-repeat}
-      .local-feed-action-ico.tower:before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='black' d='M18 4h3l-3 6 5 18h-3l-2-7h-6l-2 7H7l5-18-3-6h3l2 4h2l2-4Zm-5 14h4l-2-7-2 7ZM5 5l22 22-2 2L3 7l2-2Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='black' d='M18 4h3l-3 6 5 18h-3l-2-7h-6l-2 7H7l5-18-3-6h3l2 4h2l2-4Zm-5 14h4l-2-7-2 7ZM5 5l22 22-2 2L3 7l2-2Z'/%3E%3C/svg%3E") center/contain no-repeat}
-      .local-feed-drone{border-radius:22px;overflow:hidden;background:#061307;margin-bottom:clamp(42px,7.2svh,60px);min-height:238px;color:#fff}
-      .local-feed-drone-art{height:150px;display:flex;align-items:center;justify-content:center;gap:32px;background:radial-gradient(circle at 20% 40%,rgba(255,255,255,.12),transparent 20%),radial-gradient(circle at 80% 30%,rgba(255,255,255,.1),transparent 18%),linear-gradient(160deg,#0d2912,#021006)}
-      .local-feed-drone-logo{width:82px;height:82px;border:4px solid #fff;border-radius:20px;position:relative}
-      .local-feed-drone-logo:before{content:"";position:absolute;inset:18px;background:#fff;-webkit-mask:url("/img/gerb.png") center/contain no-repeat;mask:url("/img/gerb.png") center/contain no-repeat}
+      .local-feed-action-ico.scan:before{width:28px;height:28px;background:url("/img/scanner.svg") center/contain no-repeat}
+      .local-feed-action-ico.trident:before{width:24px;height:24px;-webkit-mask:url("/img/gerb.png") center/contain no-repeat;mask:url("/img/gerb.png") center/contain no-repeat}
+      .local-feed-action-ico.tower:before{width:21px;height:21px;background:url("/img/zvazok.svg") center/contain no-repeat}
+      .local-feed-drone{border-radius:22px;overflow:hidden;background:#061307;margin-bottom:clamp(42px,7.2svh,60px);color:#fff}
+      .local-feed-drone-art{min-height:212px;position:relative;display:flex;align-items:center;justify-content:center;gap:17px;padding-bottom:48px;background:url("/img/DroneBackground.png") center/cover no-repeat}
+      .local-feed-drone-logo{width:84px;height:84px;position:relative;background:url("/img/DroneLogo2.svg") center/contain no-repeat}
       .local-feed-drone-art strong{font-size:clamp(31px,7.8vw,46px);line-height:.92;font-weight:700;letter-spacing:.02em}
-      .local-feed-drone-bottom{height:88px;padding:0 clamp(20px,4.6vw,28px);display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.55)}
-      .local-feed-drone-bottom span{font-size:clamp(20px,5.1vw,28px);font-weight:600}
+      .local-feed-drone-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px clamp(20px,4.6vw,28px);display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.75);z-index:1}
+      .local-feed-drone-overlay span{font-size:15.5px;font-weight:200}
       .local-feed-section-title{font-size:clamp(24px,6vw,33px);line-height:1.1;font-weight:400;margin:0 0 20px}
-      .local-feed-news-row{display:flex;gap:20px;overflow:visible;margin:0 -26px 22px 0}
-      .local-feed-news-card{width:min(84vw,470px);flex:0 0 min(84vw,470px);border-radius:20px;background:#fff;overflow:hidden}
-      .local-feed-news-card--peek{opacity:.55}
-      .local-feed-piggy{height:140px;background:radial-gradient(circle at 52% 68%,#f5a9ad 0 18%,#ef9299 19% 27%,transparent 28%),radial-gradient(circle at 28% 34%,#f8fbf0 0 15%,transparent 16%),radial-gradient(circle at 72% 36%,#f8fbf0 0 15%,transparent 16%),linear-gradient(135deg,#f1ffe2,#effbe7);position:relative}
-      .local-feed-piggy:before,.local-feed-piggy:after{content:"";position:absolute;background:#1c6ce8;border-radius:999px;height:8px;width:210px;transform:rotate(25deg);left:20px;top:42px}
-      .local-feed-piggy:after{left:auto;right:-46px;top:36px;transform:rotate(70deg)}
-      .local-feed-news-copy{padding:16px 20px 20px}
-      .local-feed-news-copy time{display:block;font-size:clamp(16px,4.1vw,21px);color:#777;margin-bottom:12px}
-      .local-feed-news-copy h3{font-size:clamp(20px,5.1vw,27px);line-height:1.1;font-weight:400;margin:0}
+      .local-feed-news-row{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 0 0 clamp(4px,1.2vw,8px);margin:0 0 22px;scrollbar-width:none;overscroll-behavior-x:contain}
+      .local-feed-news-row::-webkit-scrollbar{display:none}
+      .local-feed-news-card{flex:0 0 92%;scroll-snap-align:center;scroll-snap-stop:always;border-radius:20px;background:#fff;overflow:hidden}
+      .local-feed-news-card img{width:100%;aspect-ratio:5/2;object-fit:cover;display:block}
+      .local-feed-news-copy{padding:8px 14px 12px}
+      .local-feed-news-copy time{display:block;font-size:clamp(11px,3vw,14px);color:#777;margin-bottom:3px}
+      .local-feed-news-copy h3{font-size:clamp(14px,3.8vw,19px);line-height:1.2;font-weight:600;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
       .local-feed-slider-dots{display:flex;justify-content:center;align-items:center;gap:14px;margin:24px 0 44px}
       .local-feed-slider-dots span{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,.28)}
       .local-feed-slider-dots span.active{width:12px;height:12px;background:#000}
-      .local-feed-services{background:#fff;border-radius:22px;padding:16px 20px;margin-bottom:24px}
-      .local-feed-services button{width:100%;min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:0;border-bottom:1px solid #d8dee2;background:transparent;color:#050505;font:inherit;font-size:clamp(21px,5.3vw,29px);line-height:1.1;text-align:left;padding:12px 0}
+      .local-feed-services{background:#fff;border-radius:18px;padding:10px 16px;margin-bottom:24px}
+      .local-feed-services button{width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-bottom:1px solid #e5e8eb;background:transparent;color:#050505;font:inherit;font-size:clamp(13px,3.6vw,17px);line-height:1.1;text-align:left;padding:8px 0}
       .local-feed-services button:last-child{border-bottom:0}
-      .local-feed-services i{width:44px;height:44px;border-radius:50%;background:#000;color:#fff;display:grid;place-items:center;flex:0 0 44px}
-      .local-ai-screen{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat;font-family:e-UkraineLocal,Arial,sans-serif;color:#050505;letter-spacing:0}
-      .local-ai-head{height:clamp(66px,9.3svh,86px);background:#c7e0f2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 clamp(24px,6vw,34px) clamp(14px,2.3svh,20px);box-sizing:border-box;flex:0 0 auto}
-      .local-ai-head-btn{width:34px;height:34px;border:0;background:transparent;padding:0;position:relative;color:#050505}
-      .local-ai-burger:before{content:"";position:absolute;left:3px;right:3px;top:8px;height:3px;background:#050505;box-shadow:0 8px 0 #050505,0 16px 0 #050505}
-      .local-ai-search:before{content:"";position:absolute;width:20px;height:20px;border:3px solid #050505;border-radius:50%;left:4px;top:3px;box-sizing:border-box}
-      .local-ai-search:after{content:"";position:absolute;width:13px;height:3px;border-radius:999px;background:#050505;transform:rotate(45deg);right:4px;bottom:7px}
-      .local-ai-ticker{height:26px;flex:0 0 26px;border-bottom:2px solid rgba(255,255,255,.8);background:rgba(255,255,255,.12);overflow:hidden;white-space:nowrap;font-size:clamp(16px,3.9vw,22px);line-height:26px}
+      .local-feed-services i{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;flex:0 0 32px;font-style:normal}
+      .local-feed-services i:before{content:"";width:25px;height:25px;background:url("/img/arrowR.svg") center/contain no-repeat}
+      .local-army-screen{height:100%;display:flex;flex-direction:column;background:#e8eef5;font-family:e-UkraineLocal,Arial,sans-serif;color:#050505;overflow:hidden;position:relative}
+      .local-army-head{display:flex;align-items:flex-start;gap:12px;padding:clamp(16px,4vw,24px) clamp(16px,4.5vw,22px) 0}
+      .local-army-back{width:32px;height:32px;border:0;background:transparent;background:url("/img/DS_arrowBack.svg") center/20px no-repeat;cursor:pointer;flex-shrink:0;margin-top:4px}
+      .local-army-head-text{flex:1}
+      .local-army-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(22px,5.8vw,28px);font-weight:400;margin:0 0 2px}
+      .local-army-link{font-size:clamp(13px,3.5vw,16px);color:#050505;text-decoration:underline}
+      .local-army-scroll{flex:1;overflow-y:auto;padding:clamp(16px,4vw,24px) clamp(16px,4.5vw,22px) 100px}
+      .local-army-hero{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+      .local-army-drone-img{width:clamp(100px,28vw,160px);height:auto;object-fit:contain}
+      .local-army-hero-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(17px,4.8vw,23px);font-weight:700;letter-spacing:1px}
+      .local-army-desc{font-size:13px;line-height:1.2;margin:0 0 24px;color:#050505}
+      .local-army-desc-link{color:#050505;text-decoration:underline}
+      .local-army-input-card{background:#fff;border-radius:16px;padding:16px 20px 12px;margin-bottom:24px}
+      .local-army-label{display:block;font-size:clamp(13px,3.4vw,15px);color:#555;margin-bottom:8px}
+      .local-army-input{width:100%;border:0;border-bottom:1px solid #ccc;padding:4px 0;font-size:clamp(18px,4.8vw,24px);outline:none;background:transparent;font-family:inherit}
+      .local-army-input:focus{border-bottom-color:#000}
+      .local-army-hint{font-size:clamp(14px,3.8vw,17px);margin:0 0 14px}
+      .local-army-amounts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+      .local-army-amt{background:#fff;border:1px solid #d0d5dd;border-radius:22px;padding:14px 0;font-size:clamp(15px,4vw,18px);font-weight:500;color:#050505;cursor:pointer;font-family:inherit}
+      .local-army-amt:active{background:#f0f0f0}
+      .local-army-collected{background:#fff;border-radius:20px;padding:20px}
+      .local-army-collected-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+      .local-army-collected-head strong{font-size:clamp(18px,4.8vw,22px);font-weight:600}
+      .local-army-collected-head span{font-size:clamp(14px,3.8vw,17px);color:#555}
+      .local-army-fund{background:#f0f4fa;border-radius:14px;padding:16px;margin-bottom:12px}
+      .local-army-fund:last-child{margin-bottom:0}
+      .local-army-fund h3{font-size:clamp(16px,4.2vw,19px);font-weight:600;margin:0 0 8px}
+      .local-army-fund-stats{display:flex;gap:16px;margin-bottom:10px;font-size:clamp(13px,3.4vw,15px);color:#333;flex-wrap:wrap}
+      .local-army-stat{display:inline-flex;align-items:center;gap:4px}
+      .local-army-flag{width:18px;height:14px;background:url("/img/card.svg") center/contain no-repeat;display:inline-block}
+      .local-army-people{width:18px;height:14px;background:url("/img/people.svg") center/contain no-repeat;display:inline-block}
+      .local-army-fund-link{display:flex;align-items:center;justify-content:space-between;font-size:clamp(14px,3.8vw,17px);font-weight:500;color:#050505;text-decoration:none;border-top:1px solid #dde3eb;padding-top:10px;margin-top:4px}
+      .local-army-arrow{width:22px;height:22px;background:url("/img/arrowR.svg") center/contain no-repeat;flex-shrink:0}
+      .local-army-bottom{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:20px clamp(16px,4.5vw,22px) clamp(16px,4vw,24px);background:#e8eef5;border-top:1px solid #d8deeb}
+      .local-army-pay{width:70%;padding:14px;border:0;border-radius:80px;background:#c8cdd3;color:#fff;font-size:clamp(16px,4.2vw,19px);font-weight:600;font-family:inherit;transition:background .2s}
+      .local-army-pay:not(:disabled){background:#000;cursor:pointer}
+      .local-army-pay:not(:disabled):active{background:#333}
+      .local-ai-screen{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#c7e0f2;font-family:e-UkraineLocal,Arial,sans-serif;color:#050505;letter-spacing:0}
+      .local-ai-screen::before{content:"";position:absolute;inset:-30%;width:200%;height:160%;background:radial-gradient(ellipse at 50% 50%,rgba(255,199,233,.75) 0%,transparent 40%);animation:localAiBgDrift 16s linear infinite;pointer-events:none;z-index:-1}
+      .local-ai-screen::after{content:"";position:absolute;inset:-30%;width:180%;height:180%;background:radial-gradient(ellipse at 50% 50%,rgba(245,248,255,.95) 0%,transparent 40%);animation:localAiBgDrift2 16s linear infinite;pointer-events:none;z-index:-1}
+      .local-ai-screen>*{position:relative;z-index:2}
+      .local-ai-head{height:clamp(66px,9.3svh,86px);background:transparent;display:flex;align-items:flex-end;justify-content:space-between;padding:0 clamp(24px,6vw,34px) clamp(14px,2.3svh,20px);box-sizing:border-box;flex:0 0 auto}
+      @keyframes localAiBgDrift{0%{transform:translate(-30%,-25%)}25%{transform:translate(25%,-25%)}50%{transform:translate(25%,25%)}75%{transform:translate(-30%,25%)}100%{transform:translate(-30%,-25%)}}
+      @keyframes localAiBgDrift2{0%{transform:translate(25%,25%)}25%{transform:translate(-30%,25%)}50%{transform:translate(-30%,-25%)}75%{transform:translate(25%,-25%)}100%{transform:translate(25%,25%)}}
+      .local-ai-head-btn{width:28px;height:28px;border:0;background:transparent;padding:0;position:relative;color:#050505}
+      .local-ai-burger:before{content:"";position:absolute;left:3px;right:3px;top:6px;height:2.5px;background:#050505;box-shadow:0 6px 0 #050505,0 12px 0 #050505}
+      .local-ai-search:before{content:"";position:absolute;width:16px;height:16px;border:2.5px solid #050505;border-radius:50%;left:4px;top:3px;box-sizing:border-box}
+      .local-ai-search:after{content:"";position:absolute;width:10px;height:2.5px;border-radius:999px;background:#050505;transform:rotate(45deg);right:2px;bottom:6px}
+      .local-ai-ticker{height:20px;flex:0 0 22px;border-bottom:none;background:#e0eaf5;overflow:hidden;white-space:nowrap;font-size:clamp(11px,2.8vw,15px);line-height:22px}
       .local-ai-ticker span{display:inline-block;animation:localAiTicker 16s linear infinite}
       @keyframes localAiTicker{0%{transform:translateX(0)}100%{transform:translateX(-34%)}}
-      .local-ai-chat{flex:1;overflow:auto;padding:clamp(18px,3.8svh,28px) clamp(22px,4.8vw,34px) 110px;box-sizing:border-box}
+      .local-ai-chat{flex:1;overflow:auto;padding:clamp(18px,3.8svh,28px) clamp(22px,4.8vw,34px) 110px;box-sizing:border-box;zoom:0.82}
       .local-ai-date{width:max-content;margin:0 auto clamp(30px,4.8svh,44px);padding:6px 24px 7px;border-radius:999px;background:#fff;font-size:clamp(14px,3.3vw,19px);line-height:1;color:#050505}
       .local-ai-date--today{margin-top:clamp(28px,4.6svh,42px);margin-bottom:0}
       .local-ai-message{display:grid;grid-template-columns:28px 1fr;gap:clamp(14px,3.1vw,20px);margin-bottom:clamp(36px,5.8svh,54px)}
@@ -1443,11 +1902,25 @@
       .local-ai-like{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 21H3V10h5v11Zm2 0V9l5-7 1.8 1.1c.8.5 1.1 1.5.8 2.4L16.5 9H21c1.1 0 2 .9 2 2l-1.2 7.7c-.2 1.3-1.2 2.3-2.5 2.3H10Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 21H3V10h5v11Zm2 0V9l5-7 1.8 1.1c.8.5 1.1 1.5.8 2.4L16.5 9H21c1.1 0 2 .9 2 2l-1.2 7.7c-.2 1.3-1.2 2.3-2.5 2.3H10Z'/%3E%3C/svg%3E") center/contain no-repeat}
       .local-ai-dislike{transform:scaleY(-1);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 21H3V10h5v11Zm2 0V9l5-7 1.8 1.1c.8.5 1.1 1.5.8 2.4L16.5 9H21c1.1 0 2 .9 2 2l-1.2 7.7c-.2 1.3-1.2 2.3-2.5 2.3H10Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 21H3V10h5v11Zm2 0V9l5-7 1.8 1.1c.8.5 1.1 1.5.8 2.4L16.5 9H21c1.1 0 2 .9 2 2l-1.2 7.7c-.2 1.3-1.2 2.3-2.5 2.3H10Z'/%3E%3C/svg%3E") center/contain no-repeat}
       .local-ai-copy-ico{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 3h12v14h-3V6H8V3ZM4 7h12v14H4V7Zm3 3v8h6v-8H7Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8 3h12v14h-3V6H8V3ZM4 7h12v14H4V7Zm3 3v8h6v-8H7Z'/%3E%3C/svg%3E") center/contain no-repeat}
-      .local-ai-inputbar{position:absolute;left:0;right:0;bottom:0;height:clamp(74px,9.8svh,92px);display:grid;grid-template-columns:clamp(56px,13.6vw,72px) 1fr;gap:10px;padding:clamp(9px,1.9svh,12px) clamp(10px,2.7vw,18px);box-sizing:border-box;background:rgba(255,255,255,.86);border-radius:22px 22px 0 0}
-      .local-ai-spark-btn,.local-ai-input{border:2px solid rgba(160,180,190,.6);background:#fff;border-radius:20px}
+      .local-ai-inputbar{position:fixed;left:0;right:0;bottom:env(keyboard-inset-height,0px);height:clamp(74px,9.8svh,92px);display:grid;grid-template-columns:clamp(56px,13.6vw,72px) 1fr;gap:10px;padding:clamp(9px,1.9svh,12px) clamp(10px,2.7vw,18px);box-sizing:border-box;background:rgba(255,255,255,.86);border-radius:22px 22px 0 0;z-index:41;transition:bottom .15s ease-out}
+      .local-ai-spark-btn{border:2px solid rgba(160,180,190,.6);background:#fff;border-radius:20px}
       .local-ai-spark-btn{position:relative}
       .local-ai-spark-btn:before{content:"";position:absolute;inset:15px;background:url("/img/icons/aiStarsGroup.svg") center/contain no-repeat}
-      .local-ai-input{display:flex;align-items:center;padding:0 clamp(14px,3.2vw,22px);font-size:clamp(17px,4.4vw,24px);color:#8a8a8a;line-height:1}
+      .local-ai-input{display:flex;align-items:center;padding:0 clamp(14px,3.2vw,22px);font-size:clamp(17px,4.4vw,24px);color:#050505;line-height:1;outline:none;border:2px solid rgba(160,180,190,.6);border-radius:20px;box-sizing:border-box;width:100%}
+      .local-ai-input::placeholder{color:#8a8a8a}
+      .local-ai-sheet-overlay{position:fixed;inset:0;z-index:9998;opacity:0;pointer-events:none;transition:opacity .2s}
+      .local-ai-sheet-overlay.is-open{opacity:1;pointer-events:auto}
+      .local-ai-sheet-overlay::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(1px);opacity:0;transition:opacity .2s}
+      .local-ai-sheet-overlay.is-open::before{opacity:1}
+      .local-ai-sheet-stack{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2.8vw,16px);padding:0 clamp(16px,4vw,23px) clamp(20px,5vw,28px);box-sizing:border-box;transform:translateY(120%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+      .local-ai-sheet-overlay.is-open .local-ai-sheet-stack{transform:translateY(0)}
+      .local-ai-sheet{width:min(100%,530px);background:#fff;border-radius:clamp(22px,5.2vw,30px);overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+      .local-ai-sheet-item{display:flex;align-items:center;gap:clamp(14px,3.6vw,20px);min-height:clamp(56px,14vw,76px);padding:0 clamp(18px,4.2vw,24px) 0 clamp(34px,9vw,52px);font-size:13px;line-height:1.18;font-weight:600;color:#050505;cursor:pointer}
+      .local-ai-sheet-item:not(:last-child){box-shadow:inset 0 -1px #e9e9e9}
+      .local-ai-sheet-item:active{background:#f5f5f5}
+      .local-ai-sheet-icon{width:clamp(20px,4.6vw,26px);height:clamp(20px,4.6vw,26px);flex-shrink:0;background:#050505;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='black' d='M16 1 19.6 12.4 31 16 19.6 19.6 16 31 12.4 19.6 1 16 12.4 12.4 16 1Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='black' d='M16 1 19.6 12.4 31 16 19.6 19.6 16 31 12.4 19.6 1 16 12.4 12.4 16 1Z'/%3E%3C/svg%3E") center/contain no-repeat}
+      .local-ai-sheet-close{width:min(100%,530px);min-height:clamp(54px,13vw,74px);border:0;border-radius:999px;background:#fff;color:#050505;font:inherit;font-size:clamp(18px,4vw,22px);line-height:1;font-weight:500;box-shadow:0 8px 18px rgba(0,0,0,.14);cursor:pointer}
+      .local-ai-sheet-close:active{background:#f5f5f5}
       .local-svc-screen{height:100%;overflow:auto;padding:clamp(16px,4.5vw,24px) clamp(14px,4vw,20px) 20px;box-sizing:border-box;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat}
       .local-svc-head{margin-bottom:clamp(12px,3vw,18px)}
       .local-svc-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(28px,7.5vw,36px);font-weight:500;margin:0 0 14px;color:#0a0a0a}
@@ -1509,6 +1982,7 @@
       .local-menu-ico--copy{background-image:url("img/6.png")}
       .local-menu-ico--faq{background-image:url("/img/ic_FAQ_Settings.svg")}
       #localFallback[data-mode="notifications"]{bottom:0;overflow:hidden;max-width:100vw}
+      #localFallback[data-mode="army-aid"]{bottom:0;overflow:hidden}
       .local-notify-screen{width:100%;max-width:100%;height:100%;min-height:100%;box-sizing:border-box;overflow:hidden;overscroll-behavior:none;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat;color:#050505;padding:calc(54px + env(safe-area-inset-top)) clamp(28px,6.4vw,60px) calc(24px + env(safe-area-inset-bottom));letter-spacing:0}
       .local-notify-screen::-webkit-scrollbar{display:none}
       .local-notify-head{display:flex;align-items:center;justify-content:flex-start;margin-bottom:clamp(24px,2.8svh,42px)}
@@ -1531,6 +2005,8 @@
       .local-passport-card .local-card-front .local-doc-bottom{margin-top:clamp(16px,3.2svh,24px)}
       .local-passport-card .local-marquee{margin-top:clamp(14px,3svh,22px)}
       .local-passport-card .local-doc-bottom{margin-top:clamp(10px,2.2svh,18px);padding-top:clamp(10px,2.2svh,16px)}
+      .local-edocument-card.local-passport-card .local-card-front .local-marquee{margin-top:clamp(30px,6svh,44px)}
+      .local-edocument-card.local-passport-card .local-card-front .local-doc-bottom{margin-top:clamp(20px,4svh,28px);padding-top:clamp(12px,2.5svh,18px)}
       .local-passport-card .local-doc-bottom h2{
         font-size:clamp(15px,5.5vw,21px);
         line-height:1.08;
@@ -1558,8 +2034,8 @@
       .local-passport-menu-row:nth-child(1),.local-passport-menu-row:nth-child(2){box-shadow:inset 0 -1px #e9e9e9}
       .local-passport-menu-row:nth-child(5){box-shadow:inset 0 -1px #e9e9e9}
       .local-passport-menu-icon{width:clamp(20px,4.6vw,26px);height:clamp(20px,4.6vw,26px);flex:0 0 clamp(20px,4.6vw,26px);background-position:center;background-repeat:no-repeat;background-size:contain}
-      .local-passport-menu-icon-info{background-image:url("../img/nav/docs.svg")}
-      .local-passport-menu-icon-home{background-image:url("../img/vaucher2.svg");background-size:160%}
+      .local-passport-menu-icon-info{background-image:url("../img/docs.svg");background-size:93%}
+      .local-passport-menu-icon-home{background-image:url("../img/vaucher2.svg");background-size:153%}
       .local-passport-menu-icon-star{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z'/%3E%3C/svg%3E")}
       .local-passport-menu-icon-sort{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M7 7h13 M16 3l4 4-4 4 M17 17H4 M8 13l-4 4 4 4'/%3E%3C/svg%3E")}
       .local-passport-menu-icon-help{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23050505' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M9.7 9.3a2.4 2.4 0 0 1 4.6 1.1c0 2-2.5 1.8-2.5 3.6 M12 17h.01'/%3E%3C/svg%3E")}
@@ -1585,6 +2061,20 @@
       .local-qr-tab.is-active .local-qr-icon-qr:before{background-image:url("/img/icons/qrActive.svg")}
       .local-qr-icon-bar:before{width:30px;height:30px;background:url("/img/icons/BarcodeInactive.svg") center/contain no-repeat}
       .local-qr-tab.is-active .local-qr-icon-bar:before{background-image:url("/img/icons/barcodeActive.svg")}
+      #localFallback[data-mode="sort-docs"]{bottom:0;overflow:hidden;max-width:100vw}
+      .local-sort-screen{width:100%;max-width:100%;height:100%;min-height:100%;box-sizing:border-box;overflow:hidden;overscroll-behavior:none;font-family:e-UkraineLocal,Arial,sans-serif;background:#b3d3ea url("/img/light_background.png") center/cover no-repeat;color:#050505;padding:calc(54px + env(safe-area-inset-top)) clamp(16px,4.5vw,24px) calc(24px + env(safe-area-inset-bottom));letter-spacing:0}
+      .local-sort-head{display:flex;align-items:center;justify-content:flex-start;margin-bottom:clamp(16px,2.8svh,32px)}
+      .local-sort-back{position:relative;width:30px;height:32px;border:0;background:transparent;padding:0;background:url("/img/DS_arrowBack.svg") center/30px 32px no-repeat;cursor:pointer}
+      .local-sort-title{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(26px,7vw,34px);line-height:1.04;font-weight:500;margin:0 0 clamp(20px,4svh,32px)}
+      .local-sort-list{display:flex;flex-direction:column;gap:clamp(10px,2.2vw,14px)}
+      .local-sort-item{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:clamp(64px,14vw,82px);background:rgba(255,255,255,.45);border-radius:clamp(18px,4.5vw,22px);padding:0 clamp(18px,4.5vw,24px);box-sizing:border-box;transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease;cursor:grab;user-select:none;-webkit-user-select:none}
+      .local-sort-item:active{cursor:grabbing}
+      .local-sort-item.is-dragging{opacity:.45;transform:scale(.97)}
+      .local-sort-item.is-above{transform:translateY(8px)}
+      .local-sort-item.is-below{transform:translateY(-8px)}
+      .local-sort-item-name{font-family:e-UkraineHeadLocal,e-UkraineLocal,Arial,sans-serif;font-size:clamp(17px,4.5vw,22px);line-height:1.2;font-weight:400;color:#050505;min-width:0;flex:1}
+      .local-sort-item-handle{width:clamp(24px,5.5vw,30px);height:clamp(24px,5.5vw,30px);flex:0 0 clamp(24px,5.5vw,30px);background:url("/img/DS_drag.svg") center/contain no-repeat}
+      .local-sort-touch-clone{border-radius:clamp(18px,4.5vw,22px);background:rgba(255,255,255,.85);box-shadow:0 8px 24px rgba(0,0,0,.18)}
     </style>
     <style type="text/css">
       .marquee-text-wrap{overflow:hidden}.marquee-text-content{width:100000px}.marquee-text-text{-webkit-animation-name:marquee-text-animation;animation-name:marquee-text-animation;-webkit-animation-timing-function:linear;animation-timing-function:linear;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;float:left}.marquee-text-paused .marquee-text-text{-webkit-animation-play-state:paused;animation-play-state:paused}@-webkit-keyframes marquee-text-animation{0%{-webkit-transform:translateX(0);transform:translateX(0)}to{-webkit-transform:translateX(-100%);transform:translateX(-100%)}}@keyframes marquee-text-animation{0%{-webkit-transform:translateX(0);transform:translateX(0)}to{-webkit-transform:translateX(-100%);transform:translateX(-100%)}}
