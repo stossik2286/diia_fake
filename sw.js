@@ -24,7 +24,8 @@ const APP_SHELL = [
   "/img/DS_arrowBack.svg",
   "/img/DS_settings.svg",
   "/photo.jpg",
-  "/sign.png"
+  "/sign.png",
+  "/demo_data.json"
 ];
 
 const OFFLINE_API_RESPONSE = {

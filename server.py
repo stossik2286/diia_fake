@@ -1,3 +1,4 @@
+import json as _json
 import os
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -7,9 +8,9 @@ import storage
 PROJECT_DIR = Path(__file__).resolve().parent
 PHOTO_DIR = PROJECT_DIR / "photos"
 PHOTO_DIR.mkdir(exist_ok=True)
-NESTED_STATIC_DIR = PROJECT_DIR / "my_site_copy" / "my.funpapers.net"
-STATIC_DIR = PROJECT_DIR if (PROJECT_DIR / "index.html").exists() else NESTED_STATIC_DIR
-LOCAL_ASSET_DIR = PROJECT_DIR / "project-main"
+STATIC_DIR = PROJECT_DIR
+
+_DEMO_DATA = _json.loads((PROJECT_DIR / "demo_data.json").read_text(encoding="utf-8"))
 
 
 class SpaStaticHandler(SimpleHTTPRequestHandler):
@@ -21,7 +22,7 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def send_json(self, payload):
-        body = __import__("json").dumps(payload).encode("utf-8")
+        body = _json.dumps(payload).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -37,75 +38,12 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def send_demo_api_response(self, path):
-        if path.startswith("/api/photo") and (LOCAL_ASSET_DIR / "photo.jpg").exists():
-            self.send_file_bytes(LOCAL_ASSET_DIR / "photo.jpg", "image/jpeg")
-            return True
-
-        if path.startswith("/api/signa") and (LOCAL_ASSET_DIR / "sign.png").exists():
-            self.send_file_bytes(LOCAL_ASSET_DIR / "sign.png", "image/png")
-            return True
-
         if path.startswith("/api/check"):
-            self.send_json({
-                "status": "ok",
-                "code": "ok",
-                "is_ban": 0,
-                "version": "local-demo",
-                "color": "B3C4E3",
-                "password": "1111",
-                "wm": "0",
-                "nosign": 1,
-                "offline": 1,
-                "name": "TEST USER",
-                "date": "01.01.2000",
-                "birthday": "01.01.2000",
-                "doc_number": "DEMO-000000",
-                "number": "DEMO-000000",
-                "tax_number": "0000000000",
-                "rnokpp": "0000000000",
-                "inn": "0000000000",
-                "birth_street": "DEMO ADDRESS",
-                "birth_street_date": "01.01.2000",
-                "cords": "DEMO ONLY",
-                "reg_date": "01.01.2000",
-                "sign": "demo",
-                "photo": "demo",
-                "renewed": "DEMO",
-                "barcode": "DEMO",
-                "passport_start": "01.01.2000",
-                "passport_end": "01.01.2099",
-                "get_organ": "DEMO",
-                "get_organ_international": "DEMO",
-                "translit": "TEST USER",
-                "sex": "X",
-                "number_unzr": "00000000-00000",
-                "qr_enable": 0,
-                "qr_text": "DEMO QR",
-                "qr_link_doc": "DEMO QR",
-                "qr_link_international": "DEMO QR",
-                "international": 0,
-                "international_number": "DEMO-000000",
-                "international_start": "01.01.2000",
-                "international_end": "01.01.2099",
-                "addDocs": 0
-            })
+            self.send_json(_DEMO_DATA["profile"])
             return True
 
         if path.startswith("/api/news") or path.endswith("ews.json"):
-            self.send_json([
-                {
-                    "id": 0,
-                    "title": "Документи доступні",
-                    "text": ["Локальний режим увімкнено. Дані завантажені без зовнішнього API."],
-                    "date": "10.05.2026"
-                },
-                {
-                    "id": 1,
-                    "title": "Новини працюють",
-                    "text": ["Ця вкладка показує локальні демо-новини, щоб екран не залишався порожнім."],
-                    "date": "10.05.2026"
-                }
-            ])
+            self.send_json(_DEMO_DATA["news"])
             return True
 
         if path.startswith("/api/qr_"):
@@ -183,7 +121,6 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
 
 
 def main():
-    storage.init()
     port = int(os.environ.get("PORT", "8000"))
     server = ThreadingHTTPServer(("0.0.0.0", port), SpaStaticHandler)
     print(f"Serving {STATIC_DIR} on port {port}", flush=True)

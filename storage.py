@@ -41,36 +41,3 @@ def verify_token(token: str) -> dict | None:
     if payload.get("exp", 0) <= time.time():
         return None
     return payload
-
-
-# For backward compatibility with file-based code — no-op stubs
-def init():
-    pass
-
-
-def save_token(token_key, data):
-    pass
-
-
-def get_token(token_key):
-    return None
-
-
-def delete_token(token_key):
-    pass
-
-
-def get_all_tokens():
-    return {}
-
-
-def save_photo(token_key, photo_bytes):
-    pass
-
-
-def get_photo_bytes(token_key):
-    return None
-
-
-def clean_expired():
-    return 0
