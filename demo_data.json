@@ -1,0 +1,59 @@
+{
+  "profile": {
+    "status": "ok",
+    "code": "ok",
+    "is_ban": 0,
+    "version": "local-demo",
+    "color": "B3C4E3",
+    "password": "1111",
+    "wm": "0",
+    "nosign": 1,
+    "offline": 1,
+    "name": "TEST USER",
+    "date": "01.01.2000",
+    "birthday": "01.01.2000",
+    "doc_number": "DEMO-000000",
+    "number": "DEMO-000000",
+    "tax_number": "0000000000",
+    "rnokpp": "0000000000",
+    "inn": "0000000000",
+    "birth_street": "DEMO ADDRESS",
+    "birth_street_date": "01.01.2000",
+    "cords": "DEMO ONLY",
+    "reg_date": "01.01.2000",
+    "sign": "demo",
+    "photo": "demo",
+    "renewed": "DEMO",
+    "barcode": "6131  9453  07672",
+    "passport_start": "01.01.2000",
+    "passport_end": "01.01.2099",
+    "get_organ": "DEMO",
+    "get_organ_international": "DEMO",
+    "translit": "TEST USER",
+    "sex": "X",
+    "number_unzr": "00000000-00000",
+    "qr_enable": 0,
+    "qr_text": "DEMO QR",
+    "qr_link_doc": "DEMO QR",
+    "qr_link_international": "DEMO QR",
+    "international": 0,
+    "international_number": "DEMO-000000",
+    "international_start": "01.01.2000",
+    "international_end": "01.01.2099",
+    "addDocs": 0
+  },
+  "news": [
+    {
+      "id": 0,
+      "title": "Документи доступні",
+      "text": ["Локальний режим увімкнено. Дані завантажені без зовнішнього API."],
+      "date": "10.05.2026"
+    },
+    {
+      "id": 1,
+      "title": "Новини працюють",
+      "text": ["Ця вкладка показує локальні демо-новини, щоб екран не залишався порожнім."],
+      "date": "10.05.2026"
+    }
+  ]
+}
