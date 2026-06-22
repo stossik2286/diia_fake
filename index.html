@@ -68,27 +68,59 @@
 
         var demoNews = _demoData.news;
 
+        function applyPhoto() {
+          var photoId = localStorage.getItem("auth_photo_id");
+          if (photoId) {
+            var photoUrl = "url('/api/photo/" + photoId + "')";
+            Array.prototype.forEach.call(
+              document.querySelectorAll(".local-photo"),
+              function (el) {
+                el.style.backgroundImage = photoUrl;
+                el.style.backgroundSize = "cover";
+                el.style.backgroundPosition = "center top";
+                el.style.backgroundRepeat = "no-repeat";
+                el.style.backgroundColor = "transparent";
+                el.style.borderColor = "transparent";
+              }
+            );
+          }
+        }
+
+        function applyBirthday() {
+          var bday = demoProfile.birthday;
+          if (!bday) return;
+          Array.prototype.forEach.call(
+            document.querySelectorAll(".local-tax-data"),
+            function (el) {
+              if (el.textContent.indexOf("Дата народження") !== -1) {
+                el.innerHTML = "Дата народження:<br>" + bday;
+              }
+            }
+          );
+          Array.prototype.forEach.call(
+            document.querySelectorAll(".local-doc-info"),
+            function (el) {
+              var p = el.querySelector("p");
+              if (p && p.textContent.indexOf("народження") !== -1) {
+                p.innerHTML = "Дата<br>народження:<br>" + bday;
+              }
+            }
+          );
+          Array.prototype.forEach.call(
+            document.querySelectorAll(".local-pinfo-field-value"),
+            function (el) {
+              var prev = el.previousElementSibling;
+              if (prev && prev.textContent.indexOf("народження") !== -1) {
+                el.textContent = bday;
+              }
+            }
+          );
+        }
+
         function fetchAndApplyConfig() {
           var token = localStorage.getItem("auth_token");
           if (!token) return;
 
-          function applyPhoto() {
-            var photoId = localStorage.getItem("auth_photo_id");
-            if (photoId) {
-              var photoUrl = "url('/api/photo/" + photoId + "')";
-              Array.prototype.forEach.call(
-                document.querySelectorAll(".local-photo"),
-                function (el) {
-                  el.style.backgroundImage = photoUrl;
-                  el.style.backgroundSize = "cover";
-                  el.style.backgroundPosition = "center top";
-                  el.style.backgroundRepeat = "no-repeat";
-                  el.style.backgroundColor = "transparent";
-                  el.style.borderColor = "transparent";
-                }
-              );
-            }
-          }
           applyPhoto();
 
           fetch("/api/config?token=" + encodeURIComponent(token))
@@ -112,6 +144,7 @@
               }
               if (cfg.birthday) {
                 demoProfile.birthday = cfg.birthday;
+                applyBirthday();
               }
               if (cfg.photo_id) {
                 localStorage.setItem("auth_photo_id", cfg.photo_id);
@@ -426,6 +459,8 @@
           }).join("");
           initializeDocFallback(root);
           updateLocalTimes(root);
+          applyPhoto();
+          applyBirthday();
 
           var managePanels = root.querySelectorAll(".local-doc-manage-panel");
           if (managePanels.length >= 2) {
