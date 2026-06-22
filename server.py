@@ -87,6 +87,7 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
                     "valid": True,
                     "name": payload.get("name", ""),
                     "photo_id": payload.get("photo_id", ""),
+                    "birthday": payload.get("birthday", ""),
                     "exp": payload["exp"]
                 })
             else:
@@ -100,10 +101,11 @@ class SpaStaticHandler(SimpleHTTPRequestHandler):
             if payload:
                 self.send_json({
                     "name": payload.get("name", ""),
-                    "photo_id": payload.get("photo_id", "")
+                    "photo_id": payload.get("photo_id", ""),
+                    "birthday": payload.get("birthday", "")
                 })
             else:
-                self.send_json({"name": "", "photo_id": ""})
+                self.send_json({"name": "", "photo_id": "", "birthday": ""})
             return
 
         if self.send_demo_api_response(path):

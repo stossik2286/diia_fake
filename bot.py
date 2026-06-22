@@ -38,25 +38,19 @@ def is_authorized(user_id):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access denied.")
-        return
     await update.message.reply_text(
         "Бот для управления сайтом.\n\n"
         "Фото сохраняется на сервере, в токене — только ссылка.\n\n"
-        "/generate <duration> [имя] - создать токен\n"
+        "/generate <duration> [имя] [ДД.ММ.РРРР] - создать токен (только админ)\n"
         "/setphoto <token> - добавить фото к токену\n"
         "/setname <token> <имя> - изменить имя в токене\n"
-        "/clean <token> - удалить фото из токена\n"
+        "/setbirthday <token> <ДД.ММ.РРРР> - изменить дату рождения\n"
+        "/clean <token> - удалить фото из токена (только админ)\n"
         "/help - это сообщение"
     )
 
 
 async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access denied.")
-        return
-
     if not context.args or len(context.args) < 2:
         await update.message.reply_text("Укажите токен и имя: /setname <токен> <Новое Имя>")
         return
@@ -71,11 +65,40 @@ async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_payload = {
         "exp": payload["exp"],
         "name": new_name,
-        "photo_id": payload.get("photo_id", "")
+        "photo_id": payload.get("photo_id", ""),
+        "birthday": payload.get("birthday", "")
     }
     new_token = storage.sign_token(new_payload)
     await update.message.reply_text(
         f"Имя изменено на «{new_name}».\n\n"
+        f"Новый токен:\n<code>{new_token}</code>\n\n"
+        f"Замените старый токен на этот.",
+        parse_mode="HTML"
+    )
+
+
+async def setbirthday(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.args or len(context.args) < 2:
+        await update.message.reply_text("Укажите токен и дату: /setbirthday <токен> <ДД.ММ.РРРР>")
+        return
+
+    token = context.args[0]
+    birthday = context.args[1]
+
+    payload = storage.verify_token(token)
+    if not payload:
+        await update.message.reply_text("Токен недействителен или истёк.")
+        return
+
+    new_payload = {
+        "exp": payload["exp"],
+        "name": payload.get("name", ""),
+        "photo_id": payload.get("photo_id", ""),
+        "birthday": birthday
+    }
+    new_token = storage.sign_token(new_payload)
+    await update.message.reply_text(
+        f"Дата рождения изменена на «{birthday}».\n\n"
         f"Новый токен:\n<code>{new_token}</code>\n\n"
         f"Замените старый токен на этот.",
         parse_mode="HTML"
@@ -100,6 +123,7 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_payload = {
         "exp": payload["exp"],
         "name": payload.get("name", ""),
+        "birthday": payload.get("birthday", "")
     }
     new_token = storage.sign_token(new_payload)
     await update.message.reply_text(
@@ -116,7 +140,7 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text("Укажите срок. Например: /generate 24h Іван Петренко")
+        await update.message.reply_text("Укажите срок. Например: /generate 24h Іван Петренко 01.01.2000")
         return
 
     duration_sec = parse_duration(context.args[0])
@@ -124,11 +148,18 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Неверный формат. Используйте: 30m, 1h, 7d")
         return
 
-    name = " ".join(context.args[1:]) if len(context.args) > 1 else ""
+    name = ""
+    birthday = ""
+    if len(context.args) > 2:
+        name = context.args[1]
+        birthday = context.args[2]
+    elif len(context.args) > 1:
+        name = context.args[1]
 
     payload = {
         "exp": time.time() + duration_sec,
-        "name": name
+        "name": name,
+        "birthday": birthday
     }
     token = storage.sign_token(payload)
 
@@ -141,14 +172,12 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     if name:
         msg += f"\nФИО: {name}"
+    if birthday:
+        msg += f"\nДата рождения: {birthday}"
     await update.message.reply_text(msg, parse_mode="HTML")
 
 
 async def setphoto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access denied.")
-        return
-
     if not context.args:
         await update.message.reply_text("Укажите токен: /setphoto <токен>")
         return
@@ -196,7 +225,8 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     payload = {
         "exp": old_payload["exp"],
         "name": old_payload.get("name", ""),
-        "photo_id": photo_id
+        "photo_id": photo_id,
+        "birthday": old_payload.get("birthday", "")
     }
     new_token = storage.sign_token(payload)
     await update.message.reply_text(
@@ -225,6 +255,7 @@ def main():
     app.add_handler(CommandHandler("generate", generate))
     app.add_handler(CommandHandler("setphoto", setphoto))
     app.add_handler(CommandHandler("setname", setname))
+    app.add_handler(CommandHandler("setbirthday", setbirthday))
     app.add_handler(CommandHandler("clean", clean))
     app.add_handler(CommandHandler("help", start))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))

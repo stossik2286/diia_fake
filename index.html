@@ -110,6 +110,9 @@
                   }
                 );
               }
+              if (cfg.birthday) {
+                demoProfile.birthday = cfg.birthday;
+              }
               if (cfg.photo_id) {
                 localStorage.setItem("auth_photo_id", cfg.photo_id);
                 applyPhoto();
@@ -259,12 +262,13 @@
 
         function docCardHtml(key) {
           var pName = localProfileName.replace(/ /g, "<br>");
+          var pBirthday = demoProfile.birthday || "01.01.2000";
           if (key === "tax") {
             return '<section class="local-doc-card local-tax-card">' +
               '<div class="local-doc-title">Картка платника податків</div>' +
               '<div class="local-tax-label">РНОКПП</div>' +
               '<div class="local-tax-fio">' + pName + '</div>' +
-              '<div class="local-tax-data">Дата народження:<br>20.09.2007</div>' +
+              '<div class="local-tax-data">Дата народження:<br>' + pBirthday + '</div>' +
               '<div class="local-tax-space"></div>' +
               '<div class="local-marquee"><span>Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; Документ оновлено о <b data-local-update-time></b> &bull; Перевірено Державною податковою службою &bull; </span></div>' +
               '<div class="local-doc-bottom">' +
@@ -281,7 +285,7 @@
                   '<div class="local-doc-mid">' +
                     '<div class="local-photo"></div>' +
                     '<div class="local-doc-info">' +
-                      '<p>Дата<br>народження:<br>20.09.2007</p>' +
+                      '<p>Дата<br>народження:<br>' + pBirthday + '</p>' +
                       '<p>Номер:<br>011310794</p>' +
                       '<div class="local-sign"></div>' +
                     '</div>' +
@@ -336,7 +340,7 @@
                   '<div class="local-doc-mid">' +
                     '<div class="local-photo"></div>' +
                     '<div class="local-doc-info">' +
-                      '<p>Дата<br>народження:<br>20.09.2010</p>' +
+                      '<p>Дата<br>народження:<br>' + pBirthday + '</p>' +
                       '<p>РНОКПП:<br>4044006296</p>' +
                     '</div>' +
                   '</div>' +
@@ -2252,7 +2256,7 @@
                     '<div class="local-pinfo-photo" style="' + photoStyle + '"></div>' +
                     '<div class="local-pinfo-photo-info">' +
                       '<div class="local-pinfo-field-label">Дата<br>народження:<br><span class="local-pinfo-en">Date of birth</span></div>' +
-                      '<div class="local-pinfo-field-value">20.09.2007</div>' +
+                      '<div class="local-pinfo-field-value">' + (demoProfile.birthday || "01.01.2000") + '</div>' +
                       '<div class="local-pinfo-sign"></div>' +
                     '</div>' +
                   '</div>' +
